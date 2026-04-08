@@ -47,7 +47,15 @@ export function IncidentsScreen() {
   const allReports: Incident[] = [...reports, ...(reports.length < 5 ? mockInitial.slice(0, 5 - reports.length) : [])]
     .sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  const categoryConfigs: Record<string, any> = {
+  interface CategoryConfig {
+    icon: React.ElementType;
+    color: string;
+    bg: string;
+    label: string;
+    hex: string;
+  }
+
+  const categoryConfigs: Record<string, CategoryConfig> = {
     seguridad: { icon: ShieldAlert, color: 'text-rose-500', bg: 'bg-rose-500/20', label: 'SEGURIDAD', hex: '#F21314' },
     emergencia: { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/20', label: 'EMERGENCIA', hex: '#FF6B00' },
     obstruccion: { icon: TrafficCone, color: 'text-amber-500', bg: 'bg-amber-500/20', label: 'OBSTRUCCIÓN', hex: '#F2FD14' },
@@ -78,14 +86,14 @@ export function IncidentsScreen() {
 
       <div className="space-y-4 sm:space-y-6">
         <AnimatePresence>
-          {allReports.map((report, _idx) => {
+          {allReports.map((report) => {
             const config = categoryConfigs[report.type] || categoryConfigs.entorno;
             return (
               <motion.div
                 key={report.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: _idx * 0.08 }}
+                transition={{ delay: 0.1 }}
                 onClick={() => setSelectedIncident(report)}
                 className="group relative w-full"
               >

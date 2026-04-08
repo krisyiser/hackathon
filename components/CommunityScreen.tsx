@@ -157,7 +157,7 @@ export function CommunityScreen() {
 
       {/* Feed Responsive */}
       <div className="flex flex-col">
-        {posts.map((post, _idx) => (
+        {posts.map((post) => (
           <motion.div
             key={post.id}
             initial={{ opacity: 0 }}
