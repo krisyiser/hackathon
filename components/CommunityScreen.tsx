@@ -11,6 +11,12 @@ import {
   X,
   CheckCircle2
 } from 'lucide-react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface Post {
   id: number;
@@ -164,8 +170,8 @@ export function CommunityScreen() {
                    onClick={() => handleLike(post.id)}
                    className="flex items-center gap-3 group/btn transition-all active:scale-90"
                  >
-                    <Heart className={clsx("w-6 h-6 transition-all", post.liked ? "text-rose-500 fill-rose-500" : "text-white/20 group-hover/btn:text-rose-500")} />
-                    <span className={clsx("text-sm font-black transition-all", post.liked ? "text-white" : "text-white/40")}>{post.likes}</span>
+                    <Heart className={cn("w-6 h-6 transition-all", post.liked ? "text-rose-500 fill-rose-500" : "text-white/20 group-hover/btn:text-rose-500")} />
+                    <span className={cn("text-sm font-black transition-all", post.liked ? "text-white" : "text-white/40")}>{post.likes}</span>
                  </button>
                  
                  <button className="flex items-center gap-3 group/btn">
