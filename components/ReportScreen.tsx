@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldAlert, 
@@ -33,9 +33,10 @@ export function ReportScreen() {
   const { startListening, isListening } = useVoiceReport();
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const lastTapTime = useRef<number>(0);
-  const [isMobile, setIsMobile] = React.useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsMobile(window.innerWidth < 640);
   }, []);
 
@@ -49,10 +50,29 @@ export function ReportScreen() {
     { id: 'entorno' as IncidentType, icon: Leaf, label: 'ENTORNO', color: '#14C9D9', angle: 200 },
   ];
 
+  // REAL MOBILE TOUCH SELECTION LOGIC
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isPressing) return;
+
+    // Detect element under finger for touch devices
+    const element = document.elementFromPoint(e.clientX, e.clientY);
+    const categoryEl = element?.closest('[data-category-id]');
+    
+    if (categoryEl) {
+      const catId = categoryEl.getAttribute('data-category-id') as IncidentType;
+      if (catId !== selectedCategory) {
+        setSelectedCategory(catId);
+        if (navigator.vibrate) navigator.vibrate(15);
+      }
+    } else {
+      setSelectedCategory(null);
+    }
+  };
+
   const handlePointerDown = (e: React.PointerEvent) => {
+    // Prevent default to stop scrolling/pull-to-refresh
     if (e.cancelable) e.preventDefault();
     
-    // Generate Multiple Concentric Ripples
     const centerX = e.clientX;
     const centerY = e.clientY;
     const batchId = Date.now();
@@ -65,7 +85,6 @@ export function ReportScreen() {
     }));
 
     setRipples(prev => [...prev, ...newRipples]);
-    
     setTimeout(() => {
       setRipples(prev => prev.filter(r => !newRipples.find(nr => nr.id === r.id)));
     }, 2000);
@@ -117,7 +136,11 @@ export function ReportScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-10 select-none overflow-hidden touch-none">
+    <div 
+      className="flex-1 flex flex-col items-center justify-center px-10 select-none overflow-hidden touch-none"
+      onPointerMove={handlePointerMove}
+      ref={containerRef}
+    >
       
       {/* Fullscreen Ripple Layer */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -127,11 +150,7 @@ export function ReportScreen() {
               key={ripple.id}
               initial={{ scale: 0, opacity: 0.5 }}
               animate={{ scale: 15, opacity: 0 }}
-              transition={{ 
-                duration: 1.5, 
-                delay: ripple.delay,
-                ease: "easeOut"
-              }}
+              transition={{ duration: 1.5, delay: ripple.delay, ease: "easeOut" }}
               className="absolute rounded-full border-[2px] border-rose-500/30"
               style={{
                 width: 100,
@@ -147,7 +166,6 @@ export function ReportScreen() {
 
       <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10">
         
-        {/* Ambient Radial Background */}
         <div className={cn(
           "absolute inset-0 rounded-full blur-3xl transition-all duration-1000",
           isListening ? "bg-rose-500/20 scale-125" : "bg-white/5 opacity-20 scale-110"
@@ -160,6 +178,7 @@ export function ReportScreen() {
               {categories.map((cat) => (
                 <motion.div
                   key={cat.id}
+                  data-category-id={cat.id}
                   initial={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
                   animate={{ 
                     scale: selectedCategory === cat.id ? 1.6 : 1, 
@@ -170,19 +189,15 @@ export function ReportScreen() {
                   }}
                   exit={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
                   className={cn(
-                    "absolute w-16 h-16 rounded-full glass-premium flex flex-col items-center justify-center shadow-2xl transition-all duration-300",
+                    "absolute w-16 h-16 rounded-full glass-premium flex flex-col items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto",
                     selectedCategory === cat.id ? "border-white/60" : "border-white/10 opacity-40 bg-white/5"
                   )}
                   style={{ 
                     boxShadow: selectedCategory === cat.id ? `0 0 20px ${cat.color}66` : 'none'
                   }}
-                  onPointerEnter={() => {
-                    setSelectedCategory(cat.id);
-                    if (navigator.vibrate) navigator.vibrate(15);
-                  }}
                 >
                    <div 
-                     className="w-full h-full rounded-full flex items-center justify-center transition-all"
+                     className="w-full h-full rounded-full flex items-center justify-center pointer-events-none transition-all"
                      style={{ 
                        backgroundColor: selectedCategory === cat.id ? cat.color : 'rgba(255,255,255,0.05)',
                        color: selectedCategory === cat.id ? '#000' : 'rgba(255,255,255,0.4)'
@@ -208,7 +223,6 @@ export function ReportScreen() {
           )}
         </AnimatePresence>
 
-        {/* Main HUB Trigger */}
         <button
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
@@ -241,7 +255,6 @@ export function ReportScreen() {
           <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[scan_3s_linear_infinite]" />
         </button>
 
-        {/* Instruction Text OUTSIDE of button */}
         <AnimatePresence>
           {!isPressing && (
             <motion.div 
