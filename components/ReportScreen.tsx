@@ -119,12 +119,27 @@ export function ReportScreen() {
   };
 
   const submitReport = async (type: IncidentType) => {
-    // SUPABASE REMOVED - MOCKING SUCCESS
-    console.log("Mocking report submission for:", type);
+    // INTEGRATION WITH ubicacion.js
+    const win = window as unknown as { 
+      marcadores: string[]; 
+      enviarCoordenadas?: () => void;
+    };
     
+    // Set the specific category as the only marker to "report" it
+    win.marcadores = [type];
+    
+    if (typeof win.enviarCoordenadas === 'function') {
+      console.log(`Sending report for: ${type}`);
+      win.enviarCoordenadas();
+    }
+
     setShowSuccess(true);
     if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
-    setTimeout(() => setShowSuccess(false), 2000);
+    
+    // Reset marcadores to empty or sync with ConfigScreen might happen later
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 2000);
   };
 
   return (
