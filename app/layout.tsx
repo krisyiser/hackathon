@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -34,7 +35,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={`${inter.variable} ${outfit.variable} font-sans`}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans bg-slate-950 text-white selection:bg-blue-500/30 overflow-hidden`}>
         {children}
       </body>
     </html>
