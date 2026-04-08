@@ -26,7 +26,7 @@ export function ReportScreen() {
   const [selectedCategory, setSelectedCategory] = useState<IncidentType | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [ripples, setRipples] = useState<{ id: string; x: number; y: number; delay: number }[]>([]);
-  const { startListening, isListening } = useVoiceReport();
+  const { startListening, stopListening, isListening } = useVoiceReport();
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const lastTapTime = useRef<number>(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -91,7 +91,11 @@ export function ReportScreen() {
     const DOUBLE_TAP_DELAY = 300;
 
     if (now - lastTapTime.current < DOUBLE_TAP_DELAY) {
-      startListening();
+      if (isListening) {
+        stopListening();
+      } else {
+        startListening();
+      }
       if (navigator.vibrate) navigator.vibrate([30, 30, 30]);
       lastTapTime.current = 0;
       return;

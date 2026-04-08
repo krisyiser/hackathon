@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { VoiceReportData } from '@/types';
 
 const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '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';
@@ -9,6 +9,7 @@ export function useVoiceReport() {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastTranscript, setLastTranscript] = useState('');
+  const recognitionRef = useRef<any>(null);
 
   const processSpeech = async (text: string): Promise<VoiceReportData | null> => {
     setIsProcessing(true);
@@ -48,24 +49,34 @@ export function useVoiceReport() {
     }
   };
 
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  }, []);
+
   const startListening = useCallback((): Promise<VoiceReportData | null> => {
     return new Promise((resolve) => {
-      // Check for browser support
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       
       if (!SpeechRecognition) {
-        console.error("Speech Recognition not supported in this browser.");
+        console.error("Speech Recognition not supported.");
         resolve(null);
         return;
       }
 
       const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
       recognition.lang = 'es-MX';
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
 
       recognition.onstart = () => setIsListening(true);
-      recognition.onend = () => setIsListening(false);
+      recognition.onend = () => {
+        setIsListening(false);
+        recognitionRef.current = null;
+      };
       
       recognition.onresult = async (event: any) => {
         const transcript = event.results[0][0].transcript;
@@ -77,6 +88,7 @@ export function useVoiceReport() {
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error:", event.error);
         setIsListening(false);
+        recognitionRef.current = null;
         resolve(null);
       };
 
@@ -84,5 +96,5 @@ export function useVoiceReport() {
     });
   }, []);
 
-  return { isListening, isProcessing, lastTranscript, startListening };
+  return { isListening, isProcessing, lastTranscript, startListening, stopListening };
 }
