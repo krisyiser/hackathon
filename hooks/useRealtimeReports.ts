@@ -1,15 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Report } from '@/types';
 
-/**
- * useRealtimeReports Hook
- * Currently disabled by user request to leave the feed empty.
- * Will be updated later with new data source.
- */
 export function useRealtimeReports() {
   const [reports, setReports] = useState<Report[]>([]);
+  const hasLoadedRef = useRef(false);
 
   const fetchReports = useCallback(async () => {
     try {
@@ -17,6 +13,7 @@ export function useRealtimeReports() {
       const lng = (window as any).lng_global;
       const marcadores = (window as any).marcadores || ["seguridad","emergencia","obstruccion","saturacion","entorno"];
 
+      // If coordinates are not ready yet, we will retry in the next interval
       if (!lat || !lng) return;
 
       const formData = new FormData();
@@ -48,7 +45,6 @@ export function useRealtimeReports() {
 
       if (Array.isArray(data)) {
         const parsedReports: Report[] = data.map((item: any, index: number) => {
-          // ENSURE COORDINATES ARE NUMBERS
           const reportLat = parseFloat(item.lat);
           const reportLng = parseFloat(item.lng);
           
@@ -70,8 +66,9 @@ export function useRealtimeReports() {
             }
           };
         });
-        console.log("Final Parsed Reports:", parsedReports);
+        console.log("Final Parsed Reports applied to state:", parsedReports);
         setReports(parsedReports);
+        hasLoadedRef.current = true;
       }
     } catch (err) {
       console.error("Error fetching real reports:", err);
@@ -79,12 +76,17 @@ export function useRealtimeReports() {
   }, []);
 
   useEffect(() => {
+    // Initial fetch
     fetchReports();
-    return () => {};
+    
+    // Polling every 10 seconds to keep feed updated
+    const interval = setInterval(fetchReports, 10000);
+    
+    return () => clearInterval(interval);
   }, [fetchReports]);
 
   return { 
-    reports: [] as Report[], 
+    reports, // RETURN THE STATE, NOT AN EMPTY ARRAY
     refresh: fetchReports 
   };
 }
