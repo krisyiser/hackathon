@@ -5,6 +5,7 @@ export interface Report {
   created_at: string;
   type: IncidentType;
   linea: string;
+  description?: string;
   intensidad: number;
   lat: number;
   lng: number;
