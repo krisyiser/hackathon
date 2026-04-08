@@ -50,12 +50,26 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
     seguridad: true,
     emergencia: true,
     obstruccion: true,
-    saturacion: false,
-    entorno: false
+    saturacion: true,
+    entorno: true
   });
 
-  // Sync with global marcadores in ubicacion.js
+  // Load persistence
   useEffect(() => {
+    const saved = localStorage.getItem('motus_notification_prefs');
+    if (saved) {
+      try {
+        setNotificationPrefs(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error loading prefs", e);
+      }
+    }
+  }, []);
+
+  // Sync with global marcadores in ubicacion.js and save
+  useEffect(() => {
+    localStorage.setItem('motus_notification_prefs', JSON.stringify(notificationPrefs));
+
     const activeMarkers = Object.entries(notificationPrefs)
       .filter(([, enabled]) => enabled)
       .map(([key]) => key);
