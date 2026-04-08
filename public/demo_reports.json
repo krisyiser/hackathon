@@ -1,0 +1,312 @@
+[
+  {
+    "fecha": "2026-04-08T04:52:28.000Z",
+    "titulo": "Obra sin avance",
+    "descripcion": "Se reporta una obra sin ningun avance desde hace mas de un mes en la delegacion Alvaro Obregon.",
+    "calle": "Loreto",
+    "calle_colindante": "Altamirano",
+    "direccion_objeto": "Loreto, Santa Fe, Álvaro Obregón",
+    "lat": 19.382987,
+    "lng": -99.2418386
+  },
+  {
+    "fecha": "2026-04-08T05:10:14.000Z",
+    "titulo": "Bache profundo",
+    "descripcion": "Se reporta un bache profundo que afecta la circulacion y ha provocado daños a varios vehiculos.",
+    "calle": "Avenida Revolucion",
+    "calle_colindante": "Barranca del Muerto",
+    "direccion_objeto": "Avenida Revolucion, San Angel, Álvaro Obregón",
+    "lat": 19.361421,
+    "lng": -99.189637
+  },
+  {
+    "fecha": "2026-04-08T05:22:41.000Z",
+    "titulo": "Fuga de agua",
+    "descripcion": "Vecinos reportan una fuga de agua constante que ya lleva varios dias desperdiciando agua potable.",
+    "calle": "Miguel Angel de Quevedo",
+    "calle_colindante": "Division del Norte",
+    "direccion_objeto": "Miguel Angel de Quevedo, Parque San Andres, Coyoacán",
+    "lat": 19.346002,
+    "lng": -99.161845
+  },
+  {
+    "fecha": "2026-04-08T05:34:03.000Z",
+    "titulo": "Alumbrado publico apagado",
+    "descripcion": "Se solicita reparacion de luminarias apagadas en una calle con alto flujo peatonal.",
+    "calle": "Calzada de Tlalpan",
+    "calle_colindante": "Viaducto Tlalpan",
+    "direccion_objeto": "Calzada de Tlalpan, San Lorenzo Huipulco, Tlalpan",
+    "lat": 19.292511,
+    "lng": -99.150284
+  },
+  {
+    "fecha": "2026-04-08T05:48:19.000Z",
+    "titulo": "Semaforo descompuesto",
+    "descripcion": "El semaforo permanece intermitente desde hace horas y genera riesgo de accidente.",
+    "calle": "Insurgentes Sur",
+    "calle_colindante": "Eje 10 Sur",
+    "direccion_objeto": "Insurgentes Sur, Copilco, Coyoacán",
+    "lat": 19.333744,
+    "lng": -99.186021
+  },
+  {
+    "fecha": "2026-04-08T06:01:57.000Z",
+    "titulo": "Coladera sin tapa",
+    "descripcion": "Se reporta una coladera sin tapa sobre la banqueta que representa peligro para peatones.",
+    "calle": "Tacuba",
+    "calle_colindante": "Eje Central",
+    "direccion_objeto": "Tacuba, Centro, Cuauhtémoc",
+    "lat": 19.435612,
+    "lng": -99.139884
+  },
+  {
+    "fecha": "2026-04-08T06:13:26.000Z",
+    "titulo": "Basura acumulada",
+    "descripcion": "Hay acumulacion de basura en la esquina desde hace varios dias y genera malos olores.",
+    "calle": "Ermita Iztapalapa",
+    "calle_colindante": "Rojo Gomez",
+    "direccion_objeto": "Ermita Iztapalapa, Santa Martha Acatitla, Iztapalapa",
+    "lat": 19.366248,
+    "lng": -99.040517
+  },
+  {
+    "fecha": "2026-04-08T06:25:10.000Z",
+    "titulo": "Poste inclinado",
+    "descripcion": "Un poste de luz presenta inclinacion visible y podria colapsar en caso de lluvia o viento fuerte.",
+    "calle": "Avenida Universidad",
+    "calle_colindante": "Parroquia",
+    "direccion_objeto": "Avenida Universidad, Del Valle, Benito Juárez",
+    "lat": 19.370923,
+    "lng": -99.164297
+  },
+  {
+    "fecha": "2026-04-08T06:38:44.000Z",
+    "titulo": "Banqueta destruida",
+    "descripcion": "La banqueta se encuentra levantada y rota, dificultando el paso de adultos mayores y carriolas.",
+    "calle": "Homero",
+    "calle_colindante": "Moliere",
+    "direccion_objeto": "Homero, Polanco, Miguel Hidalgo",
+    "lat": 19.436887,
+    "lng": -99.201324
+  },
+  {
+    "fecha": "2026-04-08T06:50:08.000Z",
+    "titulo": "Arbol caido",
+    "descripcion": "Un arbol caido obstruye parcialmente la vialidad y requiere retiro urgente.",
+    "calle": "Avenida Patriotismo",
+    "calle_colindante": "Benjamín Franklin",
+    "direccion_objeto": "Avenida Patriotismo, Escandón, Miguel Hidalgo",
+    "lat": 19.404119,
+    "lng": -99.181657
+  },
+  {
+    "fecha": "2026-04-08T07:03:31.000Z",
+    "titulo": "Drenaje tapado",
+    "descripcion": "Se presenta encharcamiento severo por drenaje tapado cada vez que llueve en la zona.",
+    "calle": "Canal de Miramontes",
+    "calle_colindante": "Calzada del Hueso",
+    "direccion_objeto": "Canal de Miramontes, Coapa, Tlalpan",
+    "lat": 19.300874,
+    "lng": -99.123416
+  },
+  {
+    "fecha": "2026-04-08T07:14:52.000Z",
+    "titulo": "Cableado expuesto",
+    "descripcion": "Se observan cables expuestos colgando a baja altura cerca de una zona escolar.",
+    "calle": "Doctor Vertiz",
+    "calle_colindante": "Eje 3 Sur",
+    "direccion_objeto": "Doctor Vertiz, Narvarte, Benito Juárez",
+    "lat": 19.392761,
+    "lng": -99.150928
+  },
+  {
+    "fecha": "2026-04-08T07:27:09.000Z",
+    "titulo": "Falta de poda",
+    "descripcion": "Las ramas de varios arboles bloquean luminarias y parte de la señalizacion vial.",
+    "calle": "Avenida Tecamachalco",
+    "calle_colindante": "Monte Libano",
+    "direccion_objeto": "Avenida Tecamachalco, Lomas de Chapultepec, Miguel Hidalgo",
+    "lat": 19.427561,
+    "lng": -99.223448
+  },
+  {
+    "fecha": "2026-04-08T07:39:40.000Z",
+    "titulo": "Hundimiento de calle",
+    "descripcion": "Se reporta un hundimiento progresivo en el asfalto que ya afecta el paso vehicular.",
+    "calle": "Calzada Ignacio Zaragoza",
+    "calle_colindante": "Guelatao",
+    "direccion_objeto": "Calzada Ignacio Zaragoza, Juan Escutia, Iztapalapa",
+    "lat": 19.393115,
+    "lng": -99.073286
+  },
+  {
+    "fecha": "2026-04-08T07:52:22.000Z",
+    "titulo": "Parada de autobus dañada",
+    "descripcion": "La estructura de la parada esta rota y representa riesgo para usuarios del transporte publico.",
+    "calle": "Eje 5 Norte",
+    "calle_colindante": "Avenida 612",
+    "direccion_objeto": "Eje 5 Norte, San Juan de Aragón, Gustavo A. Madero",
+    "lat": 19.466372,
+    "lng": -99.083715
+  },
+  {
+    "fecha": "2026-04-08T08:05:03.000Z",
+    "titulo": "Fuga de gas",
+    "descripcion": "Se percibe fuerte olor a gas en la zona y se solicita revision inmediata.",
+    "calle": "Avenida Centenario",
+    "calle_colindante": "Las Aguilas",
+    "direccion_objeto": "Avenida Centenario, Merced Gómez, Álvaro Obregón",
+    "lat": 19.366318,
+    "lng": -99.219841
+  },
+  {
+    "fecha": "2026-04-08T08:18:17.000Z",
+    "titulo": "Señalamiento vandalizado",
+    "descripcion": "El señalamiento de alto fue retirado y la interseccion se ha vuelto peligrosa.",
+    "calle": "Division del Norte",
+    "calle_colindante": "Miguel Laurent",
+    "direccion_objeto": "Division del Norte, Del Valle, Benito Juárez",
+    "lat": 19.371506,
+    "lng": -99.162471
+  },
+  {
+    "fecha": "2026-04-08T08:31:58.000Z",
+    "titulo": "Banqueta obstruida",
+    "descripcion": "Material de construccion invade completamente la banqueta y obliga a peatones a bajar a la calle.",
+    "calle": "Moneda",
+    "calle_colindante": "Correo Mayor",
+    "direccion_objeto": "Moneda, Centro, Cuauhtémoc",
+    "lat": 19.432614,
+    "lng": -99.131275
+  },
+  {
+    "fecha": "2026-04-08T08:44:11.000Z",
+    "titulo": "Registro abierto",
+    "descripcion": "Hay un registro abierto sin señalizacion en una zona de paso frecuente.",
+    "calle": "Avenida Observatorio",
+    "calle_colindante": "Sur 122",
+    "direccion_objeto": "Avenida Observatorio, 16 de Septiembre, Miguel Hidalgo",
+    "lat": 19.407845,
+    "lng": -99.200111
+  },
+  {
+    "fecha": "2026-04-08T08:57:36.000Z",
+    "titulo": "Encharcamiento permanente",
+    "descripcion": "La calle presenta acumulacion permanente de agua por mal nivelado del pavimento.",
+    "calle": "Avenida del Taller",
+    "calle_colindante": "Congreso de la Union",
+    "direccion_objeto": "Avenida del Taller, Jardín Balbuena, Venustiano Carranza",
+    "lat": 19.420904,
+    "lng": -99.118273
+  },
+  {
+    "fecha": "2026-04-08T09:10:28.000Z",
+    "titulo": "Luminaria intermitente",
+    "descripcion": "La luminaria falla constantemente durante la noche dejando tramos oscuros en la calle.",
+    "calle": "Plutarco Elias Calles",
+    "calle_colindante": "Avenida Te",
+    "direccion_objeto": "Plutarco Elias Calles, Granjas México, Iztacalco",
+    "lat": 19.397551,
+    "lng": -99.103817
+  },
+  {
+    "fecha": "2026-04-08T09:22:49.000Z",
+    "titulo": "Pavimento levantado",
+    "descripcion": "Se observa una seccion del pavimento levantada que genera vibraciones y peligro para motociclistas.",
+    "calle": "Avenida Cuitlahuac",
+    "calle_colindante": "Camarones",
+    "direccion_objeto": "Avenida Cuitlahuac, Pro Hogar, Azcapotzalco",
+    "lat": 19.471138,
+    "lng": -99.164932
+  },
+  {
+    "fecha": "2026-04-08T09:35:01.000Z",
+    "titulo": "Falla en semaforo peatonal",
+    "descripcion": "El semaforo peatonal no marca tiempo y dificulta el cruce seguro de personas.",
+    "calle": "Paseo de la Reforma",
+    "calle_colindante": "Rio Tiber",
+    "direccion_objeto": "Paseo de la Reforma, Cuauhtémoc, Cuauhtémoc",
+    "lat": 19.427204,
+    "lng": -99.167031
+  },
+  {
+    "fecha": "2026-04-08T09:48:20.000Z",
+    "titulo": "Tapa de registro rota",
+    "descripcion": "La tapa del registro esta fracturada y al paso de los autos produce un fuerte golpe.",
+    "calle": "Eje 1 Oriente",
+    "calle_colindante": "Fray Servando Teresa de Mier",
+    "direccion_objeto": "Eje 1 Oriente, Merced, Venustiano Carranza",
+    "lat": 19.425177,
+    "lng": -99.123859
+  },
+  {
+    "fecha": "2026-04-08T10:01:44.000Z",
+    "titulo": "Fuga en coladera",
+    "descripcion": "Sale agua constantemente de una coladera y ha deteriorado el pavimento cercano.",
+    "calle": "Avenida Taxqueña",
+    "calle_colindante": "Canal Nacional",
+    "direccion_objeto": "Avenida Taxqueña, Campestre Churubusco, Coyoacán",
+    "lat": 19.348771,
+    "lng": -99.122784
+  },
+  {
+    "fecha": "2026-04-08T10:13:59.000Z",
+    "titulo": "Cruce peligroso sin señalizacion",
+    "descripcion": "Automovilistas y peatones reportan falta de señalizacion horizontal y vertical en el cruce.",
+    "calle": "Avenida 608",
+    "calle_colindante": "Avenida 412",
+    "direccion_objeto": "Avenida 608, San Juan de Aragón, Gustavo A. Madero",
+    "lat": 19.470512,
+    "lng": -99.072038
+  },
+  {
+    "fecha": "2026-04-08T10:26:18.000Z",
+    "titulo": "Socavon pequeño",
+    "descripcion": "Se detecta un socavon pequeño que ha ido creciendo con el paso de los dias.",
+    "calle": "Prolongacion Division del Norte",
+    "calle_colindante": "Arenal",
+    "direccion_objeto": "Prolongacion Division del Norte, Potrero de San Bernardino, Xochimilco",
+    "lat": 19.258419,
+    "lng": -99.103617
+  },
+  {
+    "fecha": "2026-04-08T10:39:32.000Z",
+    "titulo": "Malla de parque dañada",
+    "descripcion": "La malla perimetral del parque presenta roturas y acceso inseguro para menores.",
+    "calle": "Avenida Chapultepec",
+    "calle_colindante": "Medellin",
+    "direccion_objeto": "Avenida Chapultepec, Roma Norte, Cuauhtémoc",
+    "lat": 19.419258,
+    "lng": -99.163476
+  },
+  {
+    "fecha": "2026-04-08T10:52:05.000Z",
+    "titulo": "Falta de balizamiento",
+    "descripcion": "No se observan lineas de cruce peatonal ni pintura vial visible en la interseccion.",
+    "calle": "Eje 6 Sur",
+    "calle_colindante": "La Viga",
+    "direccion_objeto": "Eje 6 Sur, Reforma Iztaccíhuatl, Iztacalco",
+    "lat": 19.387442,
+    "lng": -99.119683
+  },
+  {
+    "fecha": "2026-04-08T11:05:27.000Z",
+    "titulo": "Juego infantil roto",
+    "descripcion": "Uno de los juegos infantiles del parque presenta piezas flojas y riesgo para niños.",
+    "calle": "Avenida Constituyentes",
+    "calle_colindante": "General Francisco Ramirez",
+    "direccion_objeto": "Avenida Constituyentes, San Miguel Chapultepec, Miguel Hidalgo",
+    "lat": 19.411826,
+    "lng": -99.187426
+  },
+  {
+    "fecha": "2026-04-08T11:18:49.000Z",
+    "titulo": "Obstruccion por escombro",
+    "descripcion": "Se reporta acumulacion de escombro en la via publica que reduce el carril de circulacion.",
+    "calle": "Tlahuac",
+    "calle_colindante": "La Turba",
+    "direccion_objeto": "Tlahuac, Los Olivos, Tláhuac",
+    "lat": 19.286773,
+    "lng": -99.058314
+  }
+]

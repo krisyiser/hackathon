@@ -2,34 +2,20 @@
 
 import React from 'react';
 import Script from 'next/script';
+import dynamic from 'next/dynamic';
+
+const MapInner = dynamic(() => import('./MapInner'), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-slate-100 animate-pulse flex items-center justify-center font-black text-slate-400 italic">CARGANDO REPORTE DEMO...</div>
+});
 
 export function MapScreen() {
   return (
-    <div className="w-full h-full flex flex-col bg-white overflow-hidden relative">
-      {/* 
-        Official Motus Map via Iframe
-        We use the iframe because the Google Maps API Key is restricted to lookitag.com.
-        This approach ensures the map loads correctly on Netlify without Referer errors
-        and preserves the exact aesthetics requested by the project.
-      */}
+    <div className="w-full h-full flex flex-col bg-slate-100 overflow-hidden relative">
       <div id="mapa" className="flex-1 w-full h-full relative z-0">
-        <iframe 
-          src="https://lookitag.com/motus/" 
-          className="w-full h-full border-none absolute inset-0"
-          title="Motus Core Map"
-          allow="geolocation"
-        />
+        <MapInner />
       </div>
-
-      {/* 
-        Official Logic Script
-        Handles background reporting and coordinate sync
-      */}
       <Script src="/ubicacion.js" strategy="afterInteractive" />
-      
-      <style jsx global>{`
-        #mapa { width: 100%; height: 100%; }
-      `}</style>
     </div>
   );
 }

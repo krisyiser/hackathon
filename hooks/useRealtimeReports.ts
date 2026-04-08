@@ -8,33 +8,44 @@ export function useRealtimeReports() {
   const fetchStarted = useRef(false);
 
   const fetchReports = useCallback(async (force = false) => {
-    // To save Gemini tokens and prevent quota exhaustion, 
-    // we only execute this once per session/page load unless forced.
     if (fetchStarted.current && !force) return;
     fetchStarted.current = true;
+
+    const parseData = (data: any[]): Report[] => {
+      return data.map((item: any, index: number) => ({
+        id: `real-${index}-${item.fecha}`,
+        created_at: item.fecha,
+        type: item.titulo?.toLowerCase().includes('obra') || item.titulo?.toLowerCase().includes('bache') ? 'obstruccion' : 
+              item.titulo?.toLowerCase().includes('agua') || item.titulo?.toLowerCase().includes('gas') ? 'emergencia' : 
+              item.titulo?.toLowerCase().includes('alumbrado') || item.titulo?.toLowerCase().includes('semaforo') ? 'entorno' : 'seguridad',
+        linea: item.titulo || 'Alerta de Movilidad',
+        description: item.descripcion,
+        intensidad: 3,
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lng),
+        expires_at: new Date(Date.now() + 3600000).toISOString(),
+        metadata: {
+          calle: item.calle,
+          calle_colindante: item.calle_colindante,
+          direccion: item.direccion_objeto
+        }
+      }));
+    };
 
     try {
       const lat = (window as any).lat_global || 19.4326;
       const lng = (window as any).lng_global || -99.1332;
       const marcadores = (window as any).marcadores || ["seguridad","emergencia","obstruccion","saturacion","entorno"];
 
-      // Check for cached data to show something immediately
+      // Start with cache
       const cached = localStorage.getItem('motus_reports_cache');
-      if (cached) {
-        try {
-          setReports(JSON.parse(cached));
-          console.log("Loaded reports from Local Cache (Screenshot).");
-        } catch (e) {
-          localStorage.removeItem('motus_reports_cache');
-        }
-      }
+      if (cached) setReports(JSON.parse(cached));
 
       const formData = new FormData();
       formData.append("latitud", lat.toString());
       formData.append("longitud", lng.toString());
       formData.append("marcadores", Array.isArray(marcadores) ? marcadores.join(',') : marcadores);
 
-      console.log("Executory Single Snapshot Fetch to save tokens...");
       const response = await fetch("https://lookitag.com/motus/controlador/recibir_ubicacion.php", {
         method: "POST",
         body: formData
@@ -44,9 +55,8 @@ export function useRealtimeReports() {
       
       const body = await response.text();
       
-      if (body.includes("Fatal error") || body.includes("Quota exceeded")) {
-        console.warn("Backend Gemini is limited. Keeping existing cache.");
-        return;
+      if (body.includes("Fatal error") || body.includes("Quota exceeded") || body.trim() === "") {
+        throw new Error("Backend Quota Limit reached");
       }
 
       let data;
@@ -57,38 +67,29 @@ export function useRealtimeReports() {
         if (jsonMatch) data = JSON.parse(jsonMatch[0]);
       }
 
-      if (Array.isArray(data)) {
-        const parsedReports: Report[] = data.map((item: any, index: number) => ({
-          id: `real-${index}-${item.fecha}`,
-          created_at: item.fecha,
-          type: item.titulo?.toLowerCase().includes('obra') ? 'obstruccion' : 
-                item.titulo?.toLowerCase().includes('inseguridad') ? 'seguridad' : 'emergencia',
-          linea: item.titulo || 'Alerta de Movilidad',
-          description: item.descripcion,
-          intensidad: 3,
-          lat: parseFloat(item.lat),
-          lng: parseFloat(item.lng),
-          expires_at: new Date(Date.now() + 3600000).toISOString(),
-          metadata: {
-            calle: item.calle,
-            calle_colindante: item.calle_colindante,
-            direccion: item.direccion_objeto
-          }
-        }));
-        
-        setReports(parsedReports);
-        // Persist the "Snapshot"
-        localStorage.setItem('motus_reports_cache', JSON.stringify(parsedReports));
-        console.log("Snapshot successfully saved to local storage.");
+      if (Array.isArray(data) && data.length > 0) {
+        const results = parseData(data);
+        setReports(results);
+        localStorage.setItem('motus_reports_cache', JSON.stringify(results));
+      } else {
+        throw new Error("No data returned");
       }
     } catch (err) {
-      console.error("Error in snapshot fetch:", err);
+      console.warn("Backend unavailable or limited. Loading DEMO DATA as fallback.");
+      try {
+        const demoResponse = await fetch("/demo_reports.json");
+        const demoData = await demoResponse.json();
+        const demoResults = parseData(demoData);
+        setReports(demoResults);
+        localStorage.setItem('motus_reports_cache', JSON.stringify(demoResults));
+      } catch (demoErr) {
+        console.error("Critical: Could not load demo data.", demoErr);
+      }
     }
   }, []);
 
   useEffect(() => {
     fetchReports();
-    // INTERVAL REMOVED TO PRESERVE API TOKENS
   }, [fetchReports]);
 
   return { reports, refresh: fetchReports };
