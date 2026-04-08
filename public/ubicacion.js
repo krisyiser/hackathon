@@ -89,6 +89,9 @@ function enviarCoordenadas() {
     formData.append("longitud", lng_global)
     formData.append("marcadores", marcadores)
 
+    // DEMO MODE: Reporting disabled to preserve Gemini tokens
+    console.log("DEMO MODE ACTIVE: Skipping coordinate report to server.", { lat: lat_global, lng: lng_global });
+    /*
     fetch("https://lookitag.com/motus/controlador/recibir_ubicacion.php", { method: "POST", body: formData })
         .then(r => r.ok ? r.text() : Promise.reject("Error en la petición"))
         .then(body => {
@@ -102,4 +105,5 @@ function enviarCoordenadas() {
             }
         })
         .catch(err => console.error("Error:", err))
+    */
 }
