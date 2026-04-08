@@ -93,6 +93,10 @@ export function ReportScreen() {
     if (now - lastTapTime.current < DOUBLE_TAP_DELAY) {
       if (isListening) {
         stopListening();
+        // VOICE SIMULATION SUCCESS
+        setShowSuccess(true);
+        if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
+        setTimeout(() => setShowSuccess(false), 2000);
       } else {
         startListening();
       }
