@@ -16,7 +16,7 @@ type AppState = "splash" | "login" | "app";
 
 export default function Home() {
   const [appState, setAppState] = useState<AppState>("splash");
-  const [activeTab, setActiveTab] = useState<TabType>("mapa");
+  const [activeTab, setActiveTab] = useState<TabType>("reporte");
   const [theme, setTheme] = useState("apple-glass");
 
   const handleLoginSuccess = () => {
