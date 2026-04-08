@@ -6,7 +6,8 @@ import Head from 'next/head';
 import 'leaflet/dist/leaflet.css';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { Report } from '@/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useMap } from 'react-leaflet';
 
 // Dynamically import Leaflet components
 const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
@@ -16,11 +17,23 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { 
 
 const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
+// Component to handle map view updates
+function MapRefresher({ center }: { center: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center && center[0] !== 0) {
+      map.setView(center, map.getZoom());
+    }
+  }, [center, map]);
+  return null;
+}
+
 export function MapScreen() {
   const { reports } = useRealtimeReports();
   const [isMounted, setIsMounted] = useState(false);
   const [LReady, setLReady] = useState(false);
   const [userPos, setUserPos] = useState<[number, number]>(CDMX_CENTER);
+  const hasCentered = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -40,15 +53,19 @@ export function MapScreen() {
         const lat = (window as any).lat_global;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const lng = (window as any).lng_global;
-        if (lat && lng) {
+        
+        if (lat && lng && (lat !== userPos[0] || lng !== userPos[1])) {
             setUserPos([lat, lng]);
+            if (!hasCentered.current) {
+               hasCentered.current = true;
+            }
         }
-    }, 2000);
+    }, 1000);
 
     return () => clearInterval(checkInterval);
-  }, []);
+  }, [userPos]);
 
-  const getMarkerIcon = (report: Report, isUser = false) => {
+  const getMarkerIcon = (isUser = false, type = 'entorno') => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const L = (window as any).L;
     if (!L) return null;
@@ -75,7 +92,7 @@ export function MapScreen() {
       entorno: '#14C9D9'
     };
 
-    const color = neonColors[report.type] || '#14C9D9';
+    const color = neonColors[type] || '#14C9D9';
 
     return L.divIcon({
       className: 'custom-premium-marker',
@@ -108,11 +125,12 @@ export function MapScreen() {
       <MapContainer
         id="mapa"
         center={userPos}
-        zoom={15}
+        zoom={17}
         className="w-full h-full z-50"
         zoomControl={false}
         attributionControl={false}
       >
+        <MapRefresher center={userPos} />
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
@@ -121,14 +139,12 @@ export function MapScreen() {
 
         {LReady && (
           <>
-            {/* User Global Position Marker */}
-            <Marker position={userPos} icon={getMarkerIcon({} as Report, true)!} />
+            <Marker position={userPos} icon={getMarkerIcon(true)!} />
 
-            {/* Real Reports from Script */}
             {reports.map((report) => {
               if (!report.lat || !report.lng) return null;
               
-              const icon = getMarkerIcon(report);
+              const icon = getMarkerIcon(false, report.type);
               if (!icon) return null;
 
               return (
