@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
+import Head from 'next/head';
 import 'leaflet/dist/leaflet.css';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { Report } from '@/types';
@@ -18,6 +19,7 @@ const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
 const getMarkerIcon = (report: Report) => {
   if (typeof window === 'undefined') return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const L = (window as any).L; 
   if (!L) return null;
   
@@ -51,13 +53,18 @@ export function MapScreen() {
   useEffect(() => {
     setIsMounted(true);
     import('leaflet').then(L => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).L = L;
     });
 
     // Initialize global variables for ubicacion.js
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).lat_global = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).lng_global = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).accuracy_global = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).timestamp_global = null;
   }, []);
 
@@ -74,7 +81,9 @@ export function MapScreen() {
   return (
     <div id="mapa" className="w-full h-full relative overflow-hidden bg-black">
       {/* Load custom styles and scripts from user */}
-      <link rel="stylesheet" href="/principal.css" />
+      <Head>
+        <link rel="stylesheet" href="/principal.css" />
+      </Head>
       <Script 
         src="/ubicacion.js" 
         strategy="afterInteractive"
