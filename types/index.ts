@@ -10,6 +10,11 @@ export interface Report {
   lat: number;
   lng: number;
   expires_at: string;
+  metadata?: {
+    calle?: string;
+    calle_colindante?: string;
+    direccion?: string;
+  };
 }
 
 export interface VoiceReportData {

@@ -50,13 +50,20 @@ export function useRealtimeReports() {
         const parsedReports: Report[] = data.map((item: any, index: number) => ({
           id: `real-${index}-${item.fecha}`,
           created_at: item.fecha,
-          type: item.titulo?.toLowerCase().includes('obra') ? 'obstruccion' : 'seguridad', // Intelligent mapping
+          type: item.titulo?.toLowerCase().includes('obra') ? 'obstruccion' : 
+                item.titulo?.toLowerCase().includes('inseguridad') ? 'seguridad' : 'emergencia',
           linea: item.titulo || 'Alerta de Movilidad',
           description: item.descripcion,
           intensidad: 3,
           lat: item.lat,
           lng: item.lng,
-          expires_at: new Date(Date.now() + 3600000).toISOString()
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
+          // Add extra metadata for the UI
+          metadata: {
+            calle: item.calle,
+            calle_colindante: item.calle_colindante,
+            direccion: item.direccion_objeto
+          }
         }));
         setReports(parsedReports);
       }

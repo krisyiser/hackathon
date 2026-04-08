@@ -18,19 +18,13 @@ import {
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Report as Incident } from '@/types';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-interface Incident {
-  id: string | number;
-  type: string;
-  linea: string;
-  intensidad: number;
-  created_at: string;
-  description?: string;
-}
+
 
 export function IncidentsScreen() {
   const { reports } = useRealtimeReports();
@@ -192,6 +186,14 @@ export function IncidentsScreen() {
                         <p className="text-base sm:text-xl font-medium text-white/90 leading-normal sm:leading-relaxed italic tracking-tight break-words">
                            {selectedIncident.description}
                         </p>
+                        {selectedIncident.metadata?.direccion && (
+                          <div className="mt-4 flex items-center gap-2 text-white/40">
+                             <Navigation className="w-3 h-3" />
+                             <span className="text-[10px] font-bold uppercase tracking-widest">
+                               {selectedIncident.metadata.direccion}
+                             </span>
+                          </div>
+                        )}
                      </div>
                   </div>
 

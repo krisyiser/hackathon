@@ -2,15 +2,10 @@
 
 import React from 'react';
 import Script from 'next/script';
-import Head from 'next/head';
 
 export function MapScreen() {
   return (
     <div className="w-full h-full flex flex-col bg-white overflow-hidden">
-      <Head>
-        <link rel="stylesheet" href="/principal.css" />
-      </Head>
-      
       {/* 
         Official Map Container from Motus 
         Using the iframe to lookitag.com/motus/ ensures we use the 
