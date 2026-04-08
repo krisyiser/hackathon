@@ -27,6 +27,7 @@ function cn(...inputs: ClassValue[]) {
 
 export function IncidentsScreen() {
   const { reports } = useRealtimeReports();
+  console.log("Feed reports from hook:", reports);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
 
   const allReports: Incident[] = [...reports].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -69,67 +70,56 @@ export function IncidentsScreen() {
       </div>
 
       <div className="space-y-4 sm:space-y-6">
-        <AnimatePresence>
-          {allReports.map((report) => {
-            const config = categoryConfigs[report.type] || categoryConfigs.entorno;
-            return (
-              <motion.div
-                key={report.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                onClick={() => setSelectedIncident(report)}
-                className="group relative w-full"
-              >
-                <div 
-                   className="absolute -inset-1 rounded-[32px] sm:rounded-[44px] opacity-0 group-hover:opacity-102 blur-2xl transition-all duration-700 pointer-events-none" 
-                   style={{ background: config.hex + '33' }}
-                />
+        <AnimatePresence mode="popLayout">
+          {allReports.length > 0 ? (
+            allReports.map((report) => {
+              const config = categoryConfigs[report.type] || categoryConfigs.entorno;
+              return (
+                <motion.div
+                  key={report.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  onClick={() => setSelectedIncident(report)}
+                  className="group relative w-full mb-4"
+                >
+                  <div 
+                    className="absolute -inset-1 rounded-[32px] sm:rounded-[44px] opacity-0 group-hover:opacity-100 blur-2xl transition-all duration-700 pointer-events-none" 
+                    style={{ background: config.hex + '33' }}
+                  />
 
-                <div className="relative glass-card-premium p-5 sm:p-8 rounded-[32px] sm:rounded-[44px] border-white/10 hover:border-white/20 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col gap-4 sm:gap-6 shadow-2xl w-full">
-                   
-                   <div className="flex justify-between items-center gap-3 w-full">
-                      <div className="flex-1 flex items-center gap-4 sm:gap-6 min-w-0">
-                         <div className={cn("w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-[24px] flex items-center justify-center shadow-2xl relative shrink-0", config.bg, config.color)}>
-                            <config.icon className="w-6 h-6 sm:w-8 sm:h-8 relative z-10" strokeWidth={3} />
-                         </div>
-                         <div className="flex flex-col gap-0.5 sm:gap-1 min-w-0 flex-1">
-                            <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse">ALERTA ACTIVA</span>
-                            <span className="text-lg sm:text-2xl font-black text-white tracking-tighter uppercase italic group-hover:text-cyan-400 transition-colors leading-tight break-words pr-2">
-                               INCIDENTE EN {report.metadata?.calle?.toUpperCase() || 'VÍA PÚBLICA'}
-                            </span>
-                         </div>
-                      </div>
-                      <div className="shrink-0 pt-1">
-                         <div className="px-2.5 sm:px-4 py-1 rounded-full bg-white/5 border border-white/10">
-                            <span className="text-[10px] font-black text-cyan-400 tracking-widest font-mono italic">DETALLES</span>
-                         </div>
-                      </div>
-                   </div>
-
-                   <div className="flex items-center justify-between border-t border-white/5 pt-4 sm:pt-6">
-                      <div className="flex gap-1 sm:gap-2">
-                         {[...Array(5)].map((_, i) => (
-                           <div 
-                              key={i} 
-                              className={cn(
-                                "w-6 sm:w-10 h-1 sm:h-1.5 rounded-full transition-all duration-1000", 
-                                i < report.intensidad ? config.color.replace('text', 'bg') : 'bg-white/5'
-                              )} 
-                           />
-                         ))}
-                      </div>
-                      <div className="flex items-center gap-2">
-                         <div className="flex items-center gap-1 text-emerald-400/60">
-                            <CheckCircle className="w-2.5 h-2.5 sm:w-4 sm:h-4 shrink-0" strokeWidth={3} />
-                            <span className="text-[8px] sm:text-[10px] font-black tracking-widest">OK</span>
-                         </div>
-                      </div>
-                   </div>
-                </div>
-              </motion.div>
-            );
-          })}
+                  <div className="relative glass-card-premium p-5 sm:p-8 rounded-[32px] sm:rounded-[44px] border-white/10 hover:border-white/20 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col gap-4 shadow-2xl w-full">
+                    <div className="flex justify-between items-center gap-3 w-full">
+                        <div className="flex-1 flex items-center gap-4 sm:gap-6 min-w-0">
+                           <div className={cn("w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-[24px] flex items-center justify-center shadow-2xl relative shrink-0", config.bg, config.color)}>
+                              <config.icon className="w-6 h-6 sm:w-8 sm:h-8 relative z-10" strokeWidth={3} />
+                           </div>
+                           <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse">ALERTA {config.label}</span>
+                              <span className="text-lg sm:text-2xl font-black text-white tracking-tighter uppercase italic group-hover:text-cyan-400 transition-colors leading-tight break-words pr-2">
+                                 {report.linea}
+                              </span>
+                              <span className="text-[9px] text-white/20 font-mono">{report.metadata?.direccion || 'ZONA METROPOLITANA'}</span>
+                           </div>
+                        </div>
+                        <div className="shrink-0">
+                           <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-white/50 tracking-widest uppercase">
+                              {new Date(report.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                           </div>
+                        </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+               <div className="w-16 h-16 rounded-full glass-premium flex items-center justify-center mb-6 border-white/5">
+                  <Activity className="text-white/10 animate-pulse" />
+               </div>
+               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">Esperando transmisiones...</p>
+            </div>
+          )}
         </AnimatePresence>
       </div>
 
