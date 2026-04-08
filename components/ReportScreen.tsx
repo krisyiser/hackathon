@@ -129,10 +129,30 @@ export function ReportScreen() {
 
   return (
     <div 
-      className="flex-1 flex flex-col items-center justify-center px-10 select-none overflow-hidden touch-none"
+      className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative"
       onPointerMove={handlePointerMove}
       ref={containerRef}
     >
+      
+      {/* Responsive Header for consistency */}
+      <div className="w-full mb-8 sm:mb-20 px-2 flex items-end justify-between shrink-0 pointer-events-auto relative z-20">
+        <div className="flex-1 min-w-0 pr-4">
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-2 mb-2 sm:mb-4"
+          >
+             <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
+             <span className="text-[8px] sm:text-[10px] font-black text-rose-500/80 uppercase tracking-widest truncate">Aviso Inmediato</span>
+          </motion.div>
+          <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.9] mix-blend-difference break-words">Central de<br/><span className="text-white/20">Reporte.</span></h3>
+        </div>
+        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl sm:rounded-[32px] glass-premium flex items-center justify-center border-white/10 shadow-2xl relative group overflow-hidden shrink-0">
+           <Zap className="w-7 h-7 sm:w-10 sm:h-10 text-rose-500 animate-pulse" strokeWidth={3} />
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center relative w-full h-full">
       
       {/* Fullscreen Ripple Layer */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -260,10 +280,6 @@ export function ReportScreen() {
         </AnimatePresence>
       </div>
 
-      <div className="mt-24 flex flex-col items-center select-none">
-         <div className="flex gap-3 mb-4">
-            {[...Array(5)].map((_,i) => <div key={i} className="w-2 h-2 bg-white rounded-full opacity-40 shadow-xl" />)}
-         </div>
       </div>
     </div>
   );
