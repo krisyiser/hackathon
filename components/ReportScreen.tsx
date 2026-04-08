@@ -12,9 +12,7 @@ import {
   Leaf,
   Plus
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import { IncidentType } from '@/types';
-import { calculateExpiry } from '@/hooks/useRealtimeReports';
 import { useVoiceReport } from '@/hooks/useVoiceReport';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -119,20 +117,12 @@ export function ReportScreen() {
   };
 
   const submitReport = async (type: IncidentType) => {
-    const { error } = await supabase.from('reports').insert({
-      type,
-      linea: 'REPORTE_GESTOR_INTELIGENTE',
-      intensidad: 5,
-      lat: CDMX_CENTER[0] + (Math.random() - 0.5) * 0.015,
-      lng: CDMX_CENTER[1] + (Math.random() - 0.5) * 0.015,
-      expires_at: calculateExpiry(type).toISOString()
-    });
-
-    if (!error) {
-      setShowSuccess(true);
-      if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
-      setTimeout(() => setShowSuccess(false), 2000);
-    }
+    // SUPABASE REMOVED - MOCKING SUCCESS
+    console.log("Mocking report submission for:", type);
+    
+    setShowSuccess(true);
+    if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
+    setTimeout(() => setShowSuccess(false), 2000);
   };
 
   return (
