@@ -12,6 +12,7 @@ import { ConfigScreen } from '@/components/ConfigScreen';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('reporte');
+  const [theme, setTheme] = useState('apple-glass');
 
   const renderScreen = () => {
     switch (activeTab) {
@@ -19,13 +20,13 @@ export default function Home() {
       case 'incidentes': return <IncidentsScreen />;
       case 'reporte': return <ReportScreen />;
       case 'comunidad': return <CommunityScreen />;
-      case 'configuracion': return <ConfigScreen />;
+      case 'configuracion': return <ConfigScreen onThemeChange={setTheme} />;
       default: return <ReportScreen />;
     }
   };
 
   return (
-    <main className="relative h-[100dvh] w-screen bg-black overflow-hidden selection:bg-white/20 flex flex-col font-sans">
+    <main className={`theme-${theme} relative h-[100dvh] w-screen bg-black overflow-hidden selection:bg-white/20 flex flex-col font-sans transition-all duration-700`}>
       
       {/* Premium Apple-style Overlights */}
       <div className="overlight overlight-cyan opacity-25" />

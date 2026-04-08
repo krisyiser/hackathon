@@ -195,3 +195,12 @@ button {
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
+
+/* Theme Modes */
+.theme-nocturno { filter: sepia(0.5) contrast(0.9) brightness(1.1); }
+.theme-alto-contraste { filter: contrast(1.5) saturate(1.5) brightness(1.2); }
+.theme-claro { 
+  background-color: #f8fafc !important; 
+  filter: invert(1) hue-rotate(180deg) brightness(1.05);
+}
+.theme-apple-glass { filter: none; }
