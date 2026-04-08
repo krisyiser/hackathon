@@ -5,7 +5,6 @@ import Script from 'next/script';
 import Head from 'next/head';
 import 'leaflet/dist/leaflet.css';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
-import { Report } from '@/types';
 import { useEffect, useState, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 
