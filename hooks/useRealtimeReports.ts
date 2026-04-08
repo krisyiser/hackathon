@@ -32,39 +32,45 @@ export function useRealtimeReports() {
       if (!response.ok) throw new Error("Fetch failed");
       
       const body = await response.text();
+      console.log("Raw Server Response:", body);
       
-      // The user confirmed it arrives as a JSON array of objects
-      // Example: [{"fecha":"...","titulo":"...","descripcion":"...","lat":...,"lng":...}]
       let data;
       try {
         data = JSON.parse(body);
       } catch (e) {
-        // Fallback or handle cases where it might not be pure JSON (like with <br/> or extra text)
         const jsonMatch = body.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
           data = JSON.parse(jsonMatch[0]);
         }
       }
 
+      console.log("Parsed Data Array:", data);
+
       if (Array.isArray(data)) {
-        const parsedReports: Report[] = data.map((item: any, index: number) => ({
-          id: `real-${index}-${item.fecha}`,
-          created_at: item.fecha,
-          type: item.titulo?.toLowerCase().includes('obra') ? 'obstruccion' : 
-                item.titulo?.toLowerCase().includes('inseguridad') ? 'seguridad' : 'emergencia',
-          linea: item.titulo || 'Alerta de Movilidad',
-          description: item.descripcion,
-          intensidad: 3,
-          lat: item.lat,
-          lng: item.lng,
-          expires_at: new Date(Date.now() + 3600000).toISOString(),
-          // Add extra metadata for the UI
-          metadata: {
-            calle: item.calle,
-            calle_colindante: item.calle_colindante,
-            direccion: item.direccion_objeto
-          }
-        }));
+        const parsedReports: Report[] = data.map((item: any, index: number) => {
+          // ENSURE COORDINATES ARE NUMBERS
+          const reportLat = parseFloat(item.lat);
+          const reportLng = parseFloat(item.lng);
+          
+          return {
+            id: `real-${index}-${item.fecha}`,
+            created_at: item.fecha,
+            type: item.titulo?.toLowerCase().includes('obra') ? 'obstruccion' : 
+                  item.titulo?.toLowerCase().includes('inseguridad') ? 'seguridad' : 'emergencia',
+            linea: item.titulo || 'Alerta de Movilidad',
+            description: item.descripcion,
+            intensidad: 3,
+            lat: reportLat,
+            lng: reportLng,
+            expires_at: new Date(Date.now() + 3600000).toISOString(),
+            metadata: {
+              calle: item.calle,
+              calle_colindante: item.calle_colindante,
+              direccion: item.direccion_objeto
+            }
+          };
+        });
+        console.log("Final Parsed Reports:", parsedReports);
         setReports(parsedReports);
       }
     } catch (err) {
