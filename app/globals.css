@@ -135,6 +135,16 @@ html, body {
   to { transform: translateY(100vh); }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out infinite;
+}
+
 ::selection {
   background: rgba(255, 255, 255, 0.2);
   color: white;
