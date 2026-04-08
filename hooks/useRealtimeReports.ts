@@ -4,16 +4,27 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Report, IncidentType } from '@/types';
 import { addMinutes, isAfter, parseISO } from 'date-fns';
+import { 
+  ShieldAlert, 
+  TrafficCone, 
+  Users, 
+  Mic, 
+  Check, 
+  AlertCircle,
+  Sparkles
+} from 'lucide-react';
 
 const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
 export function calculateExpiry(type: IncidentType): Date {
   const now = new Date();
   const durations: Record<IncidentType, number> = {
-    'saturacion': 20,
-    'retraso': 45, // Assuming Traffic/Choque corresponds to retraso/tráfico
-    'inseguridad': 60,
-    'manifestacion': 180,
+    seguridad: 30,
+    emergencia: 45,
+    obstruccion: 120,
+    saturacion: 60,
+    entorno: 180,
+    manifestacion: 180
   };
   return addMinutes(now, durations[type] || 30);
 }
@@ -34,8 +45,8 @@ export function useRealtimeReports() {
         {
           id: '1',
           created_at: new Date().toISOString(),
-          type: 'inseguridad',
-          linea: 'Metro Estación Hidalgo - Perímetro Cardinal',
+          type: 'seguridad',
+          linea: 'Metro Estación Hidalgo - Riesgo Crítico',
           intensidad: 4,
           lat: CDMX_CENTER[0] + 0.005,
           lng: CDMX_CENTER[1] + 0.005,
@@ -44,12 +55,12 @@ export function useRealtimeReports() {
         {
           id: '2',
           created_at: new Date().toISOString(),
-          type: 'retraso',
-          linea: 'Eje Central - Tráfico Intenso',
-          intensidad: 2,
+          type: 'obstruccion',
+          linea: 'Eje Central - Manifestación Activa',
+          intensidad: 3,
           lat: CDMX_CENTER[0] - 0.008,
           lng: CDMX_CENTER[1] - 0.002,
-          expires_at: addMinutes(new Date(), 45).toISOString()
+          expires_at: addMinutes(new Date(), 120).toISOString()
         }
       ];
       setReports(mockReports);

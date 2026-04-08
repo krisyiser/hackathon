@@ -1,60 +1,73 @@
-import dynamic from 'next/dynamic';
-import { ActionSheet } from '@/components/ActionSheet';
-import { Sidebar } from '@/components/Sidebar';
+"use client";
 
-// Import Map with no SSR for Leaflet
-const Map = dynamic(() => import('@/components/Map'), { 
-  ssr: false,
-  loading: () => <div className="w-full h-screen bg-slate-950 animate-pulse" />
-});
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { TabType } from '@/types/navigation';
+import { BottomNav } from '@/components/BottomNav';
+import { ReportScreen } from '@/components/ReportScreen';
+import { MapScreen } from '@/components/MapScreen';
+import { IncidentsScreen } from '@/components/IncidentsScreen';
+import { CommunityScreen } from '@/components/CommunityScreen';
+import { ConfigScreen } from '@/components/ConfigScreen';
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<TabType>('reporte');
+
+  const renderScreen = () => {
+    switch (activeTab) {
+      case 'mapa': return <MapScreen />;
+      case 'incidentes': return <IncidentsScreen />;
+      case 'reporte': return <ReportScreen />;
+      case 'comunidad': return <CommunityScreen />;
+      case 'configuracion': return <ConfigScreen />;
+      default: return <ReportScreen />;
+    }
+  };
+
   return (
-    <main className="flex min-h-screen bg-slate-950 overflow-hidden relative font-sans">
-      {/* Web Layout: Sidebar */}
-      <Sidebar />
+    <main className="relative h-[100dvh] w-screen bg-black overflow-hidden selection:bg-white/20 flex flex-col font-sans">
+      
+      {/* Premium Apple-style Overlights */}
+      <div className="overlight overlight-cyan opacity-25" />
+      <div className="overlight overlight-rose opacity-15" />
 
-      {/* Main Viewport */}
-      <div className="flex-1 relative overflow-hidden">
-        <Map />
-        
-        {/* HUD Elements Overlay */}
-        <div className="absolute top-8 right-8 z-10 flex flex-col items-end gap-3 pointer-events-none group">
-          <div className="px-6 py-3 bg-slate-950/80 backdrop-blur-3xl rounded-2xl border border-white/10 shadow-2xl flex items-center gap-6 group-hover:scale-[1.02] transition-transform duration-500">
-            <div className="flex flex-col items-end border-r border-white/10 pr-6 mr-2">
-              <p className="text-[10px] text-blue-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Network_Status</p>
-              <div className="flex items-center gap-2">
-                <span className="text-[12px] text-white font-mono font-bold tracking-tighter">12ms_LATENCY</span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col items-end">
-              <p className="text-[10px] text-blue-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Active_Zone</p>
-              <span className="text-[12px] text-white font-mono font-bold tracking-tighter uppercase whitespace-nowrap italic">MEXICO CITY (CDMX) HUB</span>
-            </div>
+      {/* Modern Premium Branding (Spanish - Mobile Responsive) */}
+      <div className="fixed top-8 left-6 md:top-12 md:left-10 z-50 pointer-events-none mix-blend-difference max-w-[80vw]">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex flex-col"
+        >
+          <h1 className="text-2xl md:text-4xl font-black tracking-tighter text-white">MOTUS<span className="text-cyan-400">.</span></h1>
+          <div className="flex items-center gap-2 md:gap-3 mt-1 md:mt-2">
+             <div className="w-6 md:w-8 h-[2px] bg-white opacity-40 shrink-0" />
+             <span className="text-[10px] md:text-[12px] font-bold text-white uppercase tracking-[0.2em] md:tracking-[0.3em] truncate">Centro de Resiliencia CDMX</span>
           </div>
-        </div>
-
-        <div className="absolute top-8 left-8 z-10 block lg:hidden">
-          <h1 className="text-3xl font-black bg-gradient-to-br from-white via-blue-400 to-indigo-600 bg-clip-text text-transparent tracking-tighter drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] uppercase italic">Motus_City</h1>
-        </div>
-
-        {/* Action Button for Voice (Floating) */}
-        <div className="absolute bottom-10 right-10 z-10 hidden lg:block group">
-          <div className="absolute -inset-4 bg-blue-500/10 rounded-full blur group-hover:opacity-100 opacity-0 transition-opacity" />
-          <button 
-            className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(37,99,235,0.4)] hover:scale-110 active:scale-95 transition-all text-white border-2 border-blue-400/50"
-            title="System Command"
-          >
-            <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
-          </button>
-        </div>
-
-        {/* Mobile Layout: ActionSheet Drawer */}
-        <div className="lg:hidden">
-          <ActionSheet />
-        </div>
+        </motion.div>
       </div>
+
+      {/* Dynamic Content Viewport */}
+      <div className="flex-1 relative overflow-hidden flex flex-col">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, filter: 'blur(20px)', scale: 1.05 }}
+            animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+            exit={{ opacity: 0, filter: 'blur(20px)', scale: 0.95 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full h-full flex flex-col"
+          >
+            {renderScreen()}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Floating Bottom Navigation Bar (Glass) */}
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      {/* Side Gradients */}
+      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black/60 to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-10" />
     </main>
   );
 }

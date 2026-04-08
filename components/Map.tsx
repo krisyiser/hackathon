@@ -14,93 +14,77 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { 
 
 const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
-const getHeatColor = (type: string) => {
-  switch (type) {
-    case 'inseguridad': return '#f43f5e'; // Rose-500
-    case 'saturacion': return '#f59e0b'; // Amber-500
-    case 'retraso': return '#3b82f6'; // Blue-500
-    case 'manifestacion': return '#8b5cf6'; // Violet-500
-    default: return '#3b82f6';
-  }
+const getMarkerIcon = (report: Report) => {
+  if (typeof window === 'undefined') return null;
+  const L = require('leaflet');
+  
+  const color = report.type === 'inseguridad' ? '#f43f5e' : '#06b6d4';
+  const glow = report.type === 'inseguridad' ? 'rose-glow' : 'cyan-glow';
+  
+  return L.divIcon({
+    className: 'custom-tactical-marker',
+    html: `
+      <div class="relative flex items-center justify-center">
+        <div class="absolute w-12 h-12 rounded-full ripple-effect" style="color: ${color}"></div>
+        <div class="relative w-4 h-4 bg-white rounded-full border-2 border-slate-950 ${glow}" style="background: ${color}"></div>
+      </div>
+    `,
+    iconSize: [48, 48],
+    iconAnchor: [24, 24],
+  });
 };
 
-export function Map() {
+export default function Map() {
   const { reports } = useRealtimeReports();
-  const [L, setL] = useState<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    import('leaflet').then((leaflet) => {
-      setL(leaflet);
-    });
+    setIsMounted(true);
   }, []);
 
-  const createCustomIcon = (type: string, intensity: number) => {
-    if (!L) return null;
-    const color = getHeatColor(type);
-    const size = 12 + (intensity * 4);
-    
-    return L.divIcon({
-      className: 'custom-tactical-icon',
-      html: `
-        <div class="relative flex items-center justify-center" style="color: ${color}">
-          <div class="absolute w-full h-full rounded-full pulse-ring" style="width: ${size * 3}px; height: ${size * 3}px; left: -${size}px; top: -${size}px;"></div>
-          <div class="relative rounded-full border-2 border-white shadow-lg" style="background-color: ${color}; width: ${size}px; height: ${size}px;"></div>
-        </div>
-      `,
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2],
-    });
-  };
+  if (!isMounted) return <div className="w-full h-screen bg-slate-950 animate-pulse" />;
 
   return (
-    <div className="w-full h-screen absolute inset-0 z-0 overflow-hidden" id="map-container">
+    <div id="map-container" className="w-full h-screen relative bg-slate-950">
       <MapContainer
         center={CDMX_CENTER}
-        zoom={14}
-        zoomControl={false}
+        zoom={13}
         className="w-full h-full"
-        style={{ background: '#020617' }}
+        zoomControl={false}
+        attributionControl={false}
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; CARTO'
+          subdomains="abcd"
         />
         
-        {L && reports.map((report: Report) => (
+        {reports.map((report) => (
           <Marker
             key={report.id}
             position={[report.lat, report.lng]}
-            icon={createCustomIcon(report.type, report.intensidad)}
+            icon={getMarkerIcon(report) as any}
           >
-            <Popup className="custom-popup">
-              <div className="p-3 min-w-[200px]">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold capitalize text-slate-100 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full" style={{ background: getHeatColor(report.type) }}></span>
-                    {report.type}
-                  </h3>
-                  <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">
-                    ID: {report.id.slice(0,4)}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-300 mb-2 font-medium">{report.linea}</p>
-                <div className="flex items-center justify-between text-[10px] text-slate-500 uppercase tracking-widest font-bold">
-                  <span>Intensidad</span>
-                  <span>{report.intensidad}/5</span>
-                </div>
-                <div className="mt-1 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-                   <div 
-                    className="h-full" 
-                    style={{ background: getHeatColor(report.type), width: `${(report.intensidad/5)*100}%` }} 
-                   />
-                </div>
+            <Popup className="tactical-popup">
+              <div className="p-3 bg-slate-950/90 text-white border border-white/10 rounded-2xl backdrop-blur-xl">
+                 <p className="text-[10px] font-black uppercase text-cyan-400 mb-1 tracking-widest">{report.type}</p>
+                 <p className="text-xs font-bold uppercase">{report.linea}</p>
+                 <div className="mt-2 flex items-center gap-2">
+                    <div className="h-1 flex-1 bg-slate-800 rounded-full overflow-hidden">
+                       <div className="h-full bg-cyan-500" style={{ width: `${(report.intensidad/5)*100}%` }} />
+                    </div>
+                    <span className="text-[8px] font-mono text-slate-500">LVL_{report.intensidad}</span>
+                 </div>
               </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
+
+      {/* Aesthetic Overlay Filters */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.3)_100%)]" />
+        <div className="absolute inset-0 bg-slate-950 mix-blend-overlay opacity-30" />
+      </div>
     </div>
   );
 }
-
-export default Map;
