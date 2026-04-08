@@ -16,21 +16,40 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [error, setError] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsVerifying(true);
     setError(false);
 
-    // Simulate Network Delay
-    setTimeout(() => {
-      if (password === 'demo') {
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
+
+      const response = await fetch("https://lookitag.com/motus/controlador/login.php", { 
+        method: "POST", 
+        body: formData 
+      });
+
+      if (!response.ok) throw new Error("Error en la petición");
+
+      const body = await response.text();
+
+      if (!body.toLowerCase().includes("error")) {
+        console.log("Login Success:", body);
         onLogin();
       } else {
+        console.log("Login Failed:", body);
         setError(true);
         setIsVerifying(false);
         if (navigator.vibrate) navigator.vibrate([100, 100]);
       }
-    }, 1500);
+    } catch (err) {
+      console.error("Error:", err);
+      setError(true);
+      setIsVerifying(false);
+      if (navigator.vibrate) navigator.vibrate([100, 100]);
+    }
   };
 
   return (
@@ -66,6 +85,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
                  <Mail className="w-5 h-5" />
               </div>
               <input 
+                id="input_email"
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -81,6 +101,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
                  <Lock className="w-5 h-5" />
               </div>
               <input 
+                id="input_password"
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -97,7 +118,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <AnimatePresence>
           {error && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center">
-               <span className="text-[11px] font-black text-rose-500 uppercase tracking-widest italic">Código Inválido. Intento Registrado.</span>
+               <span className="text-[11px] font-black text-rose-500 uppercase tracking-widest italic">Código Inválido. Acceso Denegado.</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -123,7 +144,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
            <button type="button" className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] hover:text-white transition-colors">Olvidé mi código operativo</button>
            <div className="flex items-center gap-3 text-white/10">
               <Terminal className="w-4 h-4" />
-              <span className="text-[8px] font-mono lowercase">v2.0.4-build.stable</span>
+              <span className="text-[8px] font-mono lowercase">v2.1.0-auth.real</span>
            </div>
         </div>
       </motion.form>
