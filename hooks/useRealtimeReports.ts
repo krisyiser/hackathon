@@ -24,7 +24,7 @@ export function useRealtimeReports() {
       formData.append("longitud", lng.toString());
       formData.append("marcadores", Array.isArray(marcadores) ? marcadores.join(',') : marcadores);
 
-      const response = await fetch("/controlador/recibir_ubicacion.php", {
+      const response = await fetch("https://lookitag.com/motus/controlador/recibir_ubicacion.php", {
         method: "POST",
         body: formData
       });
