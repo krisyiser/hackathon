@@ -21,8 +21,6 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
-
 export function ReportScreen() {
   const [isPressing, setIsPressing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<IncidentType | null>(null);
