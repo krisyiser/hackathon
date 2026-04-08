@@ -99,7 +99,7 @@ export function MapScreen() {
         id="mapa"
         center={CDMX_CENTER}
         zoom={13}
-        className="w-full h-full grayscale brightness-[0.5] contrast-[1.2] z-0"
+        className="w-full h-full grayscale brightness-[0.6] contrast-[1.2] z-20"
         zoomControl={false}
         attributionControl={false}
       >
@@ -144,8 +144,8 @@ export function MapScreen() {
         })}
       </MapContainer>
 
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-10 opacity-50" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black to-transparent pointer-events-none z-10 opacity-50" />
     </div>
   );
 }
