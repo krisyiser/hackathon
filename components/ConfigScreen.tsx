@@ -16,7 +16,10 @@ import {
   Trash2, 
   Users, 
   Droplet, 
-  Dna 
+  Dna,
+  ShieldAlert,
+  Zap,
+  TrafficCone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -43,6 +46,14 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
     notificaciones: 'Solo Críticas'
   });
 
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    seguridad: true,
+    emergencia: true,
+    obstruccion: true,
+    saturacion: false,
+    entorno: false
+  });
+
   const [isFlipped, setIsFlipped] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -65,6 +76,11 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
     };
     setSettings(prev => ({ ...prev, interfaz: next }));
     onThemeChange(themeMap[next]);
+    triggerFeedback();
+  };
+
+  const toggleNotification = (key: keyof typeof notificationPrefs) => {
+    setNotificationPrefs(prev => ({ ...prev, [key]: !prev[key] }));
     triggerFeedback();
   };
 
@@ -233,6 +249,42 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
                 <ChevronRight className="w-6 h-6" strokeWidth={3} />
               </div>
             </button>
+          </div>
+        </div>
+
+        {/* NOTIFICATION CATEGORIES */}
+        <div>
+          <h3 className="text-[12px] font-black text-white/40 uppercase tracking-[0.4em] mb-8 ml-6">Filtros de Alerta Real</h3>
+          <div className="glass-card-premium rounded-[44px] border-white/5 divide-y divide-white/5 overflow-hidden">
+            {[
+              { id: 'seguridad', icon: ShieldAlert, label: 'Seguridad Crítica', color: 'text-rose-500' },
+              { id: 'emergencia', icon: Zap, label: 'Respuesta Emergencia', color: 'text-orange-500' },
+              { id: 'obstruccion', icon: TrafficCone, label: 'Obstrucción de Vía', color: 'text-amber-500' },
+              { id: 'saturacion', icon: Users, label: 'Saturación Flujo', color: 'text-emerald-500' },
+              { id: 'entorno', icon: Activity, label: 'Anomalías Entorno', color: 'text-cyan-500' },
+            ].map((pref) => (
+              <button
+                key={pref.id}
+                onClick={() => toggleNotification(pref.id as keyof typeof notificationPrefs)}
+                className="w-full flex items-center justify-between p-8 hover:bg-white/[0.02] transition-colors active:scale-[0.99] group"
+              >
+                <div className="flex items-center gap-6">
+                  <div className={cn("p-3 rounded-2xl bg-white/5 transition-all group-hover:scale-110", pref.color)}>
+                    <pref.icon className="w-5 h-5" strokeWidth={3} />
+                  </div>
+                  <span className="text-base font-bold text-white tracking-tight">{pref.label}</span>
+                </div>
+                <div className={cn(
+                  "w-14 h-8 rounded-full p-1.5 transition-all duration-500 flex items-center shadow-inner",
+                  notificationPrefs[pref.id as keyof typeof notificationPrefs] ? "bg-cyan-500" : "bg-white/10"
+                )}>
+                  <motion.div 
+                    animate={{ x: notificationPrefs[pref.id as keyof typeof notificationPrefs] ? 24 : 0 }}
+                    className="w-5 h-5 bg-white rounded-full shadow-lg"
+                  />
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
