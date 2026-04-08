@@ -45,18 +45,20 @@ export function useRealtimeReports() {
           const parsedDate = parseISO(dateStr);
           const createdAt = isValid(parsedDate) ? parsedDate.toISOString() : new Date().toISOString();
 
-          realReports.push({
-            id: `real-${index}`,
-            created_at: createdAt,
-            type: 'entorno', 
-            linea: textoMatch[1].trim(),
-            intensidad: 3,
-            // SIN INVENTAR: No colocamos coordenadas si el script no las manda.
-            // Esto hará que no aparezcan en el mapa, pero sí en el Feed.
-            lat: 0, 
-            lng: 0,
-            expires_at: new Date(Date.now() + 3600000).toISOString()
-          });
+          // Deduplicate by strict text matching
+          const textContent = textoMatch[1].trim();
+          if (!realReports.some(r => r.linea === textContent)) {
+            realReports.push({
+              id: `real-${index}`,
+              created_at: createdAt,
+              type: 'entorno', 
+              linea: textContent,
+              intensidad: 3,
+              lat: 0, 
+              lng: 0,
+              expires_at: new Date(Date.now() + 3600000).toISOString()
+            });
+          }
         }
       });
 
