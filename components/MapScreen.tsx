@@ -20,9 +20,9 @@ const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 const getMarkerIcon = (report: Report) => {
   if (typeof window === 'undefined') return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const L = (window as any).L; 
+  const L = (window as any).L;
   if (!L) return null;
-  
+
   const neonColors: Record<string, string> = {
     seguridad: '#F21314',
     emergencia: '#FF6B00',
@@ -30,9 +30,9 @@ const getMarkerIcon = (report: Report) => {
     saturacion: '#02D701',
     entorno: '#14C9D9'
   };
-  
+
   const color = neonColors[report.type] || '#14C9D9';
-  
+
   return L.divIcon({
     className: 'custom-premium-marker',
     html: `
@@ -84,8 +84,8 @@ export function MapScreen() {
       <Head>
         <link rel="stylesheet" href="/principal.css" />
       </Head>
-      <Script 
-        src="/ubicacion.js" 
+      <Script
+        src="/ubicacion.js"
         strategy="afterInteractive"
         onLoad={() => {
           console.log("ubicacion.js loaded");
@@ -108,11 +108,11 @@ export function MapScreen() {
           subdomains="abcd"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
-        
+
         {reports.map((report) => {
           const icon = getMarkerIcon(report);
           if (!icon) return null;
-          
+
           return (
             <Marker
               key={report.id}
@@ -121,22 +121,22 @@ export function MapScreen() {
             >
               <Popup className="premium-popup">
                 <div className="p-8 glass-premium rounded-[32px] border-white/30 text-white min-w-[240px] shadow-2xl">
-                   <p 
-                     className="text-[12px] font-black uppercase tracking-widest mb-4 opacity-70"
-                     style={{ color: neonColors[report.type] }}
-                   >
-                     {report.type.toUpperCase()}
-                   </p>
-                   <p className="text-xl font-black leading-tight tracking-tight uppercase italic">{report.linea}</p>
-                   <div className="mt-6 flex gap-2">
-                      {[...Array(5)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className="w-2 h-6 rounded-full transition-all" 
-                          style={{ backgroundColor: i < report.intensidad ? neonColors[report.type] : 'rgba(255,255,255,0.1)' }}
-                        />
-                      ))}
-                   </div>
+                  <p
+                    className="text-[12px] font-black uppercase tracking-widest mb-4 opacity-70"
+                    style={{ color: neonColors[report.type] }}
+                  >
+                    {report.type.toUpperCase()}
+                  </p>
+                  <p className="text-xl font-black leading-tight tracking-tight uppercase italic">{report.linea}</p>
+                  <div className="mt-6 flex gap-2">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-2 h-6 rounded-full transition-all"
+                        style={{ backgroundColor: i < report.intensidad ? neonColors[report.type] : 'rgba(255,255,255,0.1)' }}
+                      />
+                    ))}
+                  </div>
                 </div>
               </Popup>
             </Marker>

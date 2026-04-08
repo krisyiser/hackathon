@@ -1,40 +1,43 @@
-:root
-{
+:root {
     /*Colores*/
-    --primario:                    rgb(255, 102, 0);
-    --secundario:                    #ffffff;
-    --fuentePrincipal:                                  "sukhumvitset";
+    --primario: rgb(255, 102, 0);
+    --secundario: #ffffff;
+    --fuentePrincipal: "sukhumvitset";
 }
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     font-family: var(--fuentePrincipal);
-    -webkit-tap-highlight-color: transparent; /* iOS */
-    -moz-outline-style:none; /* Firefox */
-    outline: none; /* Todos los demás navegadores */
+    -webkit-tap-highlight-color: transparent;
+    /* iOS */
+    -moz-outline-style: none;
+    /* Firefox */
+    outline: none;
+    /* Todos los demás navegadores */
 }
 
-*::-webkit-scrollbar{
+*::-webkit-scrollbar {
     display: none;
 }
 
-div{
+div {
     display: flex;
 }
 
-img{
+img {
     object-fit: contain;
 }
 
-a{
+a {
     text-decoration: none;
 }
 
-html,body{
+html,
+body {
     width: 100%;
     height: 100%;
     background: #ffffff;
@@ -43,7 +46,10 @@ html,body{
 }
 
 
-#mapa{
+#mapa {
+    position: absolute;
     width: 100%;
     height: 100%;
+    left: 0;
+    top: 0;
 }
