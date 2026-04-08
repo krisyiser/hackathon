@@ -1,0 +1,49 @@
+:root
+{
+    /*Colores*/
+    --primario:                    rgb(255, 102, 0);
+    --secundario:                    #ffffff;
+    --fuentePrincipal:                                  "sukhumvitset";
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    font-family: var(--fuentePrincipal);
+    -webkit-tap-highlight-color: transparent; /* iOS */
+    -moz-outline-style:none; /* Firefox */
+    outline: none; /* Todos los demás navegadores */
+}
+
+*::-webkit-scrollbar{
+    display: none;
+}
+
+div{
+    display: flex;
+}
+
+img{
+    object-fit: contain;
+}
+
+a{
+    text-decoration: none;
+}
+
+html,body{
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    overflow: hidden;
+    position: relative;
+}
+
+
+#mapa{
+    width: 100%;
+    height: 100%;
+}

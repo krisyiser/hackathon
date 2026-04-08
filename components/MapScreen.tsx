@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from 'next/dynamic';
+import Script from 'next/script';
 import 'leaflet/dist/leaflet.css';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { Report } from '@/types';
@@ -15,10 +16,8 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { 
 
 const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
-// Use a helper function that only runs on client to get Leaflet object
 const getMarkerIcon = (report: Report) => {
   if (typeof window === 'undefined') return null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const L = (window as any).L; 
   if (!L) return null;
   
@@ -51,20 +50,16 @@ export function MapScreen() {
 
   useEffect(() => {
     setIsMounted(true);
-    // Ensure Leaflet is available globally for the icon helper
     import('leaflet').then(L => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).L = L;
     });
-  }, []);
 
-  const categoryLabels: Record<string, string> = {
-    seguridad: 'SEGURIDAD',
-    emergencia: 'EMERGENCIA',
-    obstruccion: 'OBSTRUCCIÓN',
-    saturacion: 'SATURACIÓN',
-    entorno: 'ENTORNO'
-  };
+    // Initialize global variables for ubicacion.js
+    (window as any).lat_global = null;
+    (window as any).lng_global = null;
+    (window as any).accuracy_global = null;
+    (window as any).timestamp_global = null;
+  }, []);
 
   const neonColors: Record<string, string> = {
     seguridad: '#F21314',
@@ -77,11 +72,24 @@ export function MapScreen() {
   if (!isMounted) return <div className="w-full h-screen bg-black" />;
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-black">
+    <div id="mapa" className="w-full h-full relative overflow-hidden bg-black">
+      {/* Load custom styles and scripts from user */}
+      <link rel="stylesheet" href="/principal.css" />
+      <Script 
+        src="/ubicacion.js" 
+        strategy="afterInteractive"
+        onLoad={() => {
+          console.log("ubicacion.js loaded");
+        }}
+      />
+
+      {/* Hidden button to prevent ubicacion.js crash if it tries to access it */}
+      <button id="btn_dar_permisos" style={{ display: 'none' }} />
+
       <MapContainer
         center={CDMX_CENTER}
         zoom={13}
-        className="w-full h-full grayscale brightness-[0.5] contrast-[1.2]"
+        className="w-full h-full grayscale brightness-[0.5] contrast-[1.2] z-0"
         zoomControl={false}
         attributionControl={false}
       >
@@ -107,7 +115,7 @@ export function MapScreen() {
                      className="text-[12px] font-black uppercase tracking-widest mb-4 opacity-70"
                      style={{ color: neonColors[report.type] }}
                    >
-                     {categoryLabels[report.type] || 'DETALLE'}
+                     {report.type.toUpperCase()}
                    </p>
                    <p className="text-xl font-black leading-tight tracking-tight uppercase italic">{report.linea}</p>
                    <div className="mt-6 flex gap-2">
