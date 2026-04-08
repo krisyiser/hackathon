@@ -7,7 +7,6 @@ import 'leaflet/dist/leaflet.css';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { Report } from '@/types';
 import { useEffect, useState } from 'react';
-import type { DivIconOptions } from 'leaflet';
 
 // Dynamically import Leaflet components
 const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
@@ -17,60 +16,24 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { 
 
 const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
-const getMarkerIcon = (report: Report, isUser = false) => {
-  if (typeof window === 'undefined') return null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const L = (window as any).L;
-  if (!L) return null;
-
-  if (isUser) {
-    return L.divIcon({
-      className: 'user-marker',
-      html: `
-        <div class="relative flex items-center justify-center">
-          <div class="absolute w-12 h-12 bg-blue-500/20 rounded-full animate-ping"></div>
-          <div class="w-6 h-6 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
-        </div>
-      `,
-      iconSize: [48, 48],
-      iconAnchor: [24, 24],
-    });
-  }
-
-  const neonColors: Record<string, string> = {
-    seguridad: '#F21314',
-    emergencia: '#FF6B00',
-    obstruccion: '#F2FD14',
-    saturacion: '#02D701',
-    entorno: '#14C9D9'
-  };
-
-  const color = neonColors[report.type] || '#14C9D9';
-
-  return L.divIcon({
-    className: 'custom-premium-marker',
-    html: `
-      <div class="relative flex items-center justify-center">
-        <div class="absolute w-14 h-14 bg-white/10 rounded-full blur-[4px] border border-white/30 animate-pulse"></div>
-        <div class="w-5 h-5 rounded-full border-2 border-white shadow-2xl" style="background: ${color}; box-shadow: 0 0 20px ${color}"></div>
-      </div>
-    `,
-    iconSize: [56, 56],
-    iconAnchor: [28, 28],
-  } as DivIconOptions);
-};
-
 export function MapScreen() {
   const { reports } = useRealtimeReports();
   const [isMounted, setIsMounted] = useState(false);
+  const [LReady, setLReady] = useState(false);
   const [userPos, setUserPos] = useState<[number, number]>(CDMX_CENTER);
 
   useEffect(() => {
     setIsMounted(true);
-    import('leaflet').then(L => {
+    
+    // Proper way to load Leaflet and its global instance
+    const initLeaflet = async () => {
+      const L = (await import('leaflet')).default;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).L = L;
-    });
+      setLReady(true);
+    };
+
+    initLeaflet();
 
     const checkInterval = setInterval(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,11 +48,54 @@ export function MapScreen() {
     return () => clearInterval(checkInterval);
   }, []);
 
+  const getMarkerIcon = (report: Report, isUser = false) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const L = (window as any).L;
+    if (!L) return null;
+
+    if (isUser) {
+      return L.divIcon({
+        className: 'user-marker',
+        html: `
+          <div class="relative flex items-center justify-center">
+            <div class="absolute w-12 h-12 bg-blue-500/20 rounded-full animate-ping"></div>
+            <div class="w-6 h-6 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
+          </div>
+        `,
+        iconSize: [48, 48],
+        iconAnchor: [24, 24],
+      });
+    }
+
+    const neonColors: Record<string, string> = {
+      seguridad: '#F21314',
+      emergencia: '#FF6B00',
+      obstruccion: '#F2FD14',
+      saturacion: '#02D701',
+      entorno: '#14C9D9'
+    };
+
+    const color = neonColors[report.type] || '#14C9D9';
+
+    return L.divIcon({
+      className: 'custom-premium-marker',
+      html: `
+        <div class="relative flex items-center justify-center">
+          <div class="absolute w-14 h-14 bg-white/10 rounded-full blur-[4px] border border-white/30 animate-pulse"></div>
+          <div class="w-5 h-5 rounded-full border-2 border-white shadow-2xl" style="background: ${color}; box-shadow: 0 0 20px ${color}"></div>
+        </div>
+      `,
+      iconSize: [56, 56],
+      iconAnchor: [28, 28],
+    });
+  };
+
   if (!isMounted) return <div className="w-full h-screen bg-black" />;
 
   return (
     <div className="w-full h-full relative overflow-hidden bg-white">
       <Head>
+        {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/principal.css" />
       </Head>
       <Script
@@ -113,32 +119,35 @@ export function MapScreen() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
-        {/* User Global Position Marker */}
-        <Marker position={userPos} icon={getMarkerIcon({} as Report, true)!} />
+        {LReady && (
+          <>
+            {/* User Global Position Marker */}
+            <Marker position={userPos} icon={getMarkerIcon({} as Report, true)!} />
 
-        {/* Real Reports from Script (matching script's data) */}
-        {reports.map((report) => {
-          // Skip if no real coordinates provided by script
-          if (!report.lat || !report.lng) return null;
-          
-          const icon = getMarkerIcon(report);
-          if (!icon) return null;
+            {/* Real Reports from Script */}
+            {reports.map((report) => {
+              if (!report.lat || !report.lng) return null;
+              
+              const icon = getMarkerIcon(report);
+              if (!icon) return null;
 
-          return (
-            <Marker
-              key={report.id}
-              position={[report.lat, report.lng]}
-              icon={icon}
-            >
-              <Popup className="premium-popup">
-                <div className="p-6 glass-premium rounded-[24px] border-white/30 text-black min-w-[200px] shadow-2xl">
-                   <p className="text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">Reporte Recibido</p>
-                   <p className="text-sm font-bold leading-tight uppercase italic">{report.linea}</p>
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
+              return (
+                <Marker
+                  key={report.id}
+                  position={[report.lat, report.lng]}
+                  icon={icon}
+                >
+                  <Popup className="premium-popup">
+                    <div className="p-6 glass-premium rounded-[24px] border-white/30 text-black min-w-[200px] shadow-2xl">
+                       <p className="text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">Reporte Recibido</p>
+                       <p className="text-sm font-bold leading-tight uppercase italic">{report.linea}</p>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
+          </>
+        )}
       </MapContainer>
     </div>
   );
