@@ -18,7 +18,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export function BottomNav({ activeTab, onTabChange }: { activeTab: TabType; onTabChange: (tab: TabType) => void }) {
-  const tabs: { id: TabType; icon: any; label: string; color: string; inactive: string }[] = [
+  const tabs: { id: TabType; icon: React.ElementType; label: string; color: string; inactive: string }[] = [
     { id: 'mapa', icon: MapIcon, label: 'Mapa', color: '#14C9D9', inactive: 'rgba(20, 201, 217, 0.15)' },
     { id: 'incidentes', icon: Newspaper, label: 'Feed', color: '#F2FD14', inactive: 'rgba(242, 253, 20, 0.15)' },
     { id: 'reporte', icon: LayoutGrid, label: 'Reportar', color: '#F21314', inactive: 'rgba(242, 19, 20, 0.15)' },

@@ -48,7 +48,7 @@ export function ReportScreen() {
     { id: 'entorno' as IncidentType, icon: Leaf, label: 'ENTORNO', color: '#14C9D9', angle: 200 },
   ];
 
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const handlePointerDown = () => {
     const now = Date.now();
     const DOUBLE_TAP_DELAY = 300;
 

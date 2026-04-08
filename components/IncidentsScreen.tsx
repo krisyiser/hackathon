@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
-import { ShieldAlert, TrafficCone, Users, Clock, Zap, ChevronRight, Activity } from 'lucide-react';
+import { ShieldAlert, TrafficCone, Users, Zap, ChevronRight, Activity } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

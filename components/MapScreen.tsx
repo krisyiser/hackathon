@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { Report } from '@/types';
 import { useEffect, useState } from 'react';
+import type { DivIconOptions } from 'leaflet';
 
 // Dynamically import Leaflet components
 const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
@@ -14,9 +15,12 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { 
 
 const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
+// Use a helper function that only runs on client to get Leaflet object
 const getMarkerIcon = (report: Report) => {
   if (typeof window === 'undefined') return null;
-  const L = require('leaflet');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const L = (window as any).L; 
+  if (!L) return null;
   
   const neonColors: Record<string, string> = {
     seguridad: '#F21314',
@@ -38,7 +42,7 @@ const getMarkerIcon = (report: Report) => {
     `,
     iconSize: [56, 56],
     iconAnchor: [28, 28],
-  });
+  } as DivIconOptions);
 };
 
 export function MapScreen() {
@@ -47,6 +51,11 @@ export function MapScreen() {
 
   useEffect(() => {
     setIsMounted(true);
+    // Ensure Leaflet is available globally for the icon helper
+    import('leaflet').then(L => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).L = L;
+    });
   }, []);
 
   const categoryLabels: Record<string, string> = {
@@ -79,36 +88,42 @@ export function MapScreen() {
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
         
-        {reports.map((report) => (
-          <Marker
-            key={report.id}
-            position={[report.lat, report.lng]}
-            icon={getMarkerIcon(report) as any}
-          >
-            <Popup className="premium-popup">
-              <div className="p-8 glass-premium rounded-[32px] border-white/30 text-white min-w-[240px] shadow-2xl">
-                 <p 
-                   className="text-[12px] font-black uppercase tracking-widest mb-4 opacity-70"
-                   style={{ color: neonColors[report.type] }}
-                 >
-                   {categoryLabels[report.type] || 'DETALLE'}
-                 </p>
-                 <p className="text-xl font-black leading-tight tracking-tight uppercase italic">{report.linea}</p>
-                 <div className="mt-6 flex gap-2">
-                    {[...Array(5)].map((_, i) => (
-                      <div 
-                        key={i} 
-                        className="w-2 h-6 rounded-full transition-all" 
-                        style={{ backgroundColor: i < report.intensidad ? neonColors[report.type] : 'rgba(255,255,255,0.1)' }}
-                      />
-                    ))}
-                 </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {reports.map((report) => {
+          const icon = getMarkerIcon(report);
+          if (!icon) return null;
+          
+          return (
+            <Marker
+              key={report.id}
+              position={[report.lat, report.lng]}
+              icon={icon}
+            >
+              <Popup className="premium-popup">
+                <div className="p-8 glass-premium rounded-[32px] border-white/30 text-white min-w-[240px] shadow-2xl">
+                   <p 
+                     className="text-[12px] font-black uppercase tracking-widest mb-4 opacity-70"
+                     style={{ color: neonColors[report.type] }}
+                   >
+                     {categoryLabels[report.type] || 'DETALLE'}
+                   </p>
+                   <p className="text-xl font-black leading-tight tracking-tight uppercase italic">{report.linea}</p>
+                   <div className="mt-6 flex gap-2">
+                      {[...Array(5)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className="w-2 h-6 rounded-full transition-all" 
+                          style={{ backgroundColor: i < report.intensidad ? neonColors[report.type] : 'rgba(255,255,255,0.1)' }}
+                        />
+                      ))}
+                   </div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
 
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />

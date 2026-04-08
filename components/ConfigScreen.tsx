@@ -8,12 +8,10 @@ import {
   Calendar, 
   ChevronRight, 
   LogOut, 
-  Save,
   Bell,
   ShieldCheck,
   Activity,
   Smartphone,
-  Camera,
   RotateCw,
   Cpu,
   CheckCircle2
@@ -27,7 +25,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export function ConfigScreen() {
-  const [profile, setProfile] = useState({
+  const [profile] = useState({
     nombre: 'Gabriel Ruiz',
     correo: 'gabriel.ruiz@motus.mx',
     direccion: 'Av. Paseo de la Reforma, CDMX',
