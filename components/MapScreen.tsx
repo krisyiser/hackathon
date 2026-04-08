@@ -79,7 +79,7 @@ export function MapScreen() {
   if (!isMounted) return <div className="w-full h-screen bg-black" />;
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-black">
+    <div className="w-full h-full relative overflow-hidden bg-white">
       {/* Load custom styles and scripts from user */}
       <Head>
         <link rel="stylesheet" href="/principal.css" />
@@ -99,12 +99,12 @@ export function MapScreen() {
         id="mapa"
         center={CDMX_CENTER}
         zoom={13}
-        className="w-full h-full grayscale brightness-[0.6] contrast-[1.2] z-20"
+        className="w-full h-full z-50"
         zoomControl={false}
         attributionControl={false}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
@@ -127,13 +127,13 @@ export function MapScreen() {
                   >
                     {report.type.toUpperCase()}
                   </p>
-                  <p className="text-xl font-black leading-tight tracking-tight uppercase italic">{report.linea}</p>
+                  <p className="text-xl font-black leading-tight tracking-tight uppercase italic text-black">{report.linea}</p>
                   <div className="mt-6 flex gap-2">
                     {[...Array(5)].map((_, i) => (
                       <div
                         key={i}
                         className="w-2 h-6 rounded-full transition-all"
-                        style={{ backgroundColor: i < report.intensidad ? neonColors[report.type] : 'rgba(255,255,255,0.1)' }}
+                        style={{ backgroundColor: i < report.intensidad ? neonColors[report.type] : 'rgba(0,0,0,0.1)' }}
                       />
                     ))}
                   </div>
@@ -143,9 +143,6 @@ export function MapScreen() {
           );
         })}
       </MapContainer>
-
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-10 opacity-50" />
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black to-transparent pointer-events-none z-10 opacity-50" />
     </div>
   );
 }
