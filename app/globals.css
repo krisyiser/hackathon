@@ -197,10 +197,54 @@ button {
 }
 
 /* Theme Modes */
-.theme-nocturno { filter: sepia(0.5) contrast(0.9) brightness(1.1); }
-.theme-alto-contraste { filter: contrast(1.5) saturate(1.5) brightness(1.2); }
-.theme-claro { 
-  background-color: #f8fafc !important; 
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
-}
+.theme-nocturno { filter: sepia(0.6) contrast(0.9) brightness(1.1); }
 .theme-apple-glass { filter: none; }
+
+/* CYBER ACCESSIBILITY (HIGH CONTRAST) */
+.theme-alto-contraste { 
+  background-color: #000000 !important;
+}
+.theme-alto-contraste main { background-color: #000000 !important; }
+.theme-alto-contraste h1, .theme-alto-contraste h2, .theme-alto-contraste h3, .theme-alto-contraste p, .theme-alto-contraste span {
+  color: #F2FD14 !important; /* Neon Yellow for maximum contrast on black */
+  font-weight: 800 !important;
+}
+.theme-alto-contraste .text-white { color: #F2FD14 !important; }
+.theme-alto-contraste .glass-card-premium {
+  background: #111111 !important;
+  border: 4px solid #ffffff !important;
+  box-shadow: none !important;
+}
+.theme-alto-contraste .lucide { color: #F2FD14 !important; }
+.theme-alto-contraste .overlight { display: none !important; }
+
+/* REFINED LIGHT MODE */
+.theme-claro { 
+  background-color: #f1f5f9 !important; 
+}
+.theme-claro main, .theme-claro .bg-black { background-color: #f1f5f9 !important; }
+.theme-claro .glass-premium,
+.theme-claro .glass-card-premium {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+}
+.theme-claro h1, .theme-claro h2, .theme-claro h3, .theme-claro p, .theme-claro span {
+  color: #0f172a !important;
+}
+.theme-claro .text-white { color: #0f172a !important; }
+.theme-claro .text-white\/40, .theme-claro .text-white\/30, .theme-claro .text-white\/20, .theme-claro .text-white\/10 {
+  color: #64748b !important;
+}
+/* Avatar fix for Light Mode */
+.theme-claro .relative.w-48.h-48, .theme-claro .relative.w-40.h-40 {
+  background: #e2e8f0 !important;
+  border: 2px solid #cbd5e1 !important;
+}
+.theme-claro .lucide-user { color: #475569 !important; opacity: 1 !important; }
+.theme-claro .mix-blend-difference { mix-blend-mode: normal !important; filter: brightness(0) !important; }
+.theme-claro .overlight { opacity: 0.1 !important; }
+.theme-claro .lucide { color: #1e293b !important; }
+.theme-claro .bg-white { background-color: #0f172a !important; } /* Invert small pods */
+.theme-claro .text-black { color: #ffffff !important; }
+.theme-claro .leaflet-tile-pane { filter: grayscale(1) invert(0) brightness(1.1) !important; }
