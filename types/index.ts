@@ -1,4 +1,4 @@
-export type IncidentType = 'seguridad' | 'emergencia' | 'obstruccion' | 'saturacion' | 'entorno' | 'manifestacion';
+export type IncidentType = 'seguridad' | 'emergencia' | 'obstruccion' | 'saturacion' | 'entorno';
 
 export interface Report {
   id: string;

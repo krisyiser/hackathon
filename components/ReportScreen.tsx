@@ -9,7 +9,7 @@ import {
   Mic, 
   Check, 
   Zap,
-  Leaf,
+  Activity,
   Plus
 } from 'lucide-react';
 import { IncidentType } from '@/types';
@@ -43,7 +43,7 @@ export function ReportScreen() {
     { id: 'emergencia' as IncidentType, icon: Zap, label: 'EMERGENCIA', color: '#FF6B00', angle: -20 },
     { id: 'obstruccion' as IncidentType, icon: TrafficCone, label: 'OBSTRUCCIÓN', color: '#F2FD14', angle: 50 },
     { id: 'saturacion' as IncidentType, icon: Users, label: 'SATURACIÓN', color: '#02D701', angle: 130 },
-    { id: 'entorno' as IncidentType, icon: Leaf, label: 'ENTORNO', color: '#14C9D9', angle: 200 },
+    { id: 'entorno' as IncidentType, icon: Activity, label: 'ENTORNO', color: '#14C9D9', angle: 200 },
   ];
 
   // REAL MOBILE TOUCH SELECTION LOGIC

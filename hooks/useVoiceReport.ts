@@ -27,7 +27,7 @@ export function useVoiceReport() {
           messages: [
             {
               role: "system",
-              content: "Actúa como un extractor de datos de movilidad urbana. Del texto proporcionado, extrae un objeto JSON con las claves: 'incidente' (debe ser uno de: 'inseguridad', 'saturacion', 'retraso', 'manifestacion'), 'gravedad' (1-5) y 'ubicacion_relativa' (string describing location). Responde SOLO con el JSON."
+              content: "Actúa como un extractor de datos de movilidad urbana. Del texto proporcionado, extrae un objeto JSON con las claves: 'incidente' (debe ser uno de: 'seguridad', 'emergencia', 'obstruccion', 'saturacion', 'entorno'), 'gravedad' (1-5) y 'ubicacion_relativa' (string describing location). Responde SOLO con el JSON."
             },
             {
               role: "user",
