@@ -8,7 +8,6 @@ import {
   TrafficCone, 
   Users, 
   Zap, 
-  ChevronRight, 
   Activity,
   Share2,
   CheckCircle,
@@ -24,11 +23,20 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+interface Incident {
+  id: string | number;
+  type: string;
+  linea: string;
+  intensidad: number;
+  created_at: string;
+  description?: string;
+}
+
 export function IncidentsScreen() {
   const { reports } = useRealtimeReports();
-  const [selectedIncident, setSelectedIncident] = useState<any>(null);
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
 
-  const mockInitial = [
+  const mockInitial: Incident[] = [
     { id: 'm1', type: 'seguridad', linea: 'Línea 1 - Balderas', intensidad: 5, created_at: new Date(Date.now() - 120000).toISOString(), description: 'ALTA PRIORIDAD: PROTOCOLO DE SEGURIDAD ACTIVADO POR DETECCIÓN DE CONDUCTAS DE RIESGO EN ANDÉN ORIENTE.' },
     { id: 'm2', type: 'emergencia', linea: 'Línea 2 - Bellas Artes', intensidad: 4, created_at: new Date(Date.now() - 300000).toISOString(), description: 'ANOMALÍA ELÉCTRICA DETECTADA EN TRANSFORMADOR B3. UNIDADES DE MANTENIMIENTO EN CAMINO.' },
     { id: 'm3', type: 'obstruccion', linea: 'Metrobús L7 - Reforma', intensidad: 3, created_at: new Date(Date.now() - 600000).toISOString(), description: 'MOVILIDAD RESTRINGIDA POR EVENTO SOCIAL MASIVO. SE RECOMIENDAN RUTAS ALTERNAS POR AV. CHAPULTEPEC.' },
@@ -36,10 +44,10 @@ export function IncidentsScreen() {
     { id: 'm5', type: 'entorno', linea: 'Centro Histórico', intensidad: 2, created_at: new Date(Date.now() - 1200000).toISOString(), description: 'PRECIPITACIONES DETECTADAS. POSIBLE ACUMULACIÓN PLUVIAL EN PASOS SUBTERRÁNEOS.' }
   ];
 
-  const allReports = [...reports, ...(reports.length < 5 ? mockInitial.slice(0, 5 - reports.length) : [])]
+  const allReports: Incident[] = [...reports, ...(reports.length < 5 ? mockInitial.slice(0, 5 - reports.length) : [])]
     .sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  const categoryConfigs: any = {
+  const categoryConfigs: Record<string, any> = {
     seguridad: { icon: ShieldAlert, color: 'text-rose-500', bg: 'bg-rose-500/20', label: 'SEGURIDAD', hex: '#F21314' },
     emergencia: { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/20', label: 'EMERGENCIA', hex: '#FF6B00' },
     obstruccion: { icon: TrafficCone, color: 'text-amber-500', bg: 'bg-amber-500/20', label: 'OBSTRUCCIÓN', hex: '#F2FD14' },
@@ -70,14 +78,14 @@ export function IncidentsScreen() {
 
       <div className="space-y-4 sm:space-y-6">
         <AnimatePresence>
-          {allReports.map((report: any, idx) => {
+          {allReports.map((report, _idx) => {
             const config = categoryConfigs[report.type] || categoryConfigs.entorno;
             return (
               <motion.div
                 key={report.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.08 }}
+                transition={{ delay: _idx * 0.08 }}
                 onClick={() => setSelectedIncident(report)}
                 className="group relative w-full"
               >

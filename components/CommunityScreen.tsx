@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
   Heart, 
-  Send,
   CheckCircle2,
   Image as ImageIcon,
   Smile,
@@ -158,7 +157,7 @@ export function CommunityScreen() {
 
       {/* Feed Responsive */}
       <div className="flex flex-col">
-        {posts.map((post, idx) => (
+        {posts.map((post, _idx) => (
           <motion.div
             key={post.id}
             initial={{ opacity: 0 }}

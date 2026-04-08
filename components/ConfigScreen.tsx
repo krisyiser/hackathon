@@ -27,7 +27,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string) => void }) {
-  const [profile, _setProfile] = useState({
+  const [profile] = useState({
     nombre: 'Gabriel Ruiz',
     correo: 'gabriel.ruiz@motus.mx',
     direccion: 'Av. Paseo de la Reforma, CDMX',
@@ -96,15 +96,15 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
             <div className="relative mb-10">
                <div className="absolute -inset-8 bg-gradient-to-tr from-cyan-500/30 to-rose-500/30 rounded-full blur-3xl animate-pulse" />
                <div className="relative w-48 h-48 rounded-[64px] glass-premium p-4 border-white/20">
-                 <div className="w-full h-full rounded-[50px] bg-gradient-to-tr from-slate-900 to-black flex items-center justify-center relative overflow-hidden">
-                    <User className="w-24 h-24 text-white opacity-20" />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 to-transparent" />
-                 </div>
-                 
-                 {/* Badge in Bottom Right */}
-                 <div className="absolute -bottom-2 -right-2 w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-2xl border-4 border-black">
-                    <Medal className="w-8 h-8 text-cyan-600" strokeWidth={3} />
-                 </div>
+                  <div className="w-full h-full rounded-[50px] bg-gradient-to-tr from-slate-900 to-black flex items-center justify-center relative overflow-hidden">
+                     <User className="w-24 h-24 text-white opacity-20" />
+                     <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 to-transparent" />
+                  </div>
+                  
+                  {/* Badge in Bottom Right */}
+                  <div className="absolute -bottom-2 -right-2 w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-2xl border-4 border-black">
+                     <Medal className="w-8 h-8 text-cyan-600" strokeWidth={3} />
+                  </div>
                </div>
             </div>
             
