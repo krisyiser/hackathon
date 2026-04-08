@@ -28,7 +28,7 @@ export function BottomNav({ activeTab, onTabChange }: { activeTab: TabType; onTa
 
   return (
     <div className="fixed bottom-10 left-0 right-0 z-[100] px-8 pointer-events-none">
-      <div className="mx-auto max-w-sm glass-premium rounded-[40px] px-2 py-2 flex items-center justify-between shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] pointer-events-auto h-20">
+      <div className="mx-auto max-w-sm glass-premium bg-white/90 dark:bg-slate-950/90 rounded-[40px] px-2 py-2 flex items-center justify-between shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] pointer-events-auto h-20">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
@@ -38,17 +38,17 @@ export function BottomNav({ activeTab, onTabChange }: { activeTab: TabType; onTa
               onClick={() => onTabChange(tab.id)}
               className={cn(
                 "relative flex flex-col items-center justify-center flex-1 h-full transition-all duration-500 rounded-[32px] group",
-                isActive ? "text-white" : "text-white/40 hover:text-white"
+                isActive ? "text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:text-white/40 dark:hover:text-white"
               )}
             >
               <div 
                 className={cn(
                   "p-2.5 rounded-2xl transition-all duration-500",
-                  isActive && "scale-110"
+                  isActive && "scale-110",
+                  isActive ? "bg-slate-200/50 dark:bg-white/10" : "bg-transparent"
                 )}
                 style={{ 
-                  color: isActive ? tab.color : 'rgba(255,255,255,0.4)',
-                  backgroundColor: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  color: isActive ? tab.color : 'inherit',
                   filter: isActive ? `drop-shadow(0 0 8px ${tab.color})` : 'none'
                 }}
               >
