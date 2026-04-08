@@ -17,11 +17,25 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { 
 
 const CDMX_CENTER: [number, number] = [19.4326, -99.1332];
 
-const getMarkerIcon = (report: Report) => {
+const getMarkerIcon = (report: Report, isUser = false) => {
   if (typeof window === 'undefined') return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const L = (window as any).L;
   if (!L) return null;
+
+  if (isUser) {
+    return L.divIcon({
+      className: 'user-marker',
+      html: `
+        <div class="relative flex items-center justify-center">
+          <div class="absolute w-12 h-12 bg-blue-500/20 rounded-full animate-ping"></div>
+          <div class="w-6 h-6 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
+        </div>
+      `,
+      iconSize: [48, 48],
+      iconAnchor: [24, 24],
+    });
+  }
 
   const neonColors: Record<string, string> = {
     seguridad: '#F21314',
@@ -49,6 +63,7 @@ const getMarkerIcon = (report: Report) => {
 export function MapScreen() {
   const { reports } = useRealtimeReports();
   const [isMounted, setIsMounted] = useState(false);
+  const [userPos, setUserPos] = useState<[number, number]>(CDMX_CENTER);
 
   useEffect(() => {
     setIsMounted(true);
@@ -57,48 +72,37 @@ export function MapScreen() {
       (window as any).L = L;
     });
 
-    // Initialize global variables for ubicacion.js
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).lat_global = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).lng_global = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).accuracy_global = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).timestamp_global = null;
-  }, []);
+    const checkInterval = setInterval(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const lat = (window as any).lat_global;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const lng = (window as any).lng_global;
+        if (lat && lng) {
+            setUserPos([lat, lng]);
+        }
+    }, 2000);
 
-  const neonColors: Record<string, string> = {
-    seguridad: '#F21314',
-    emergencia: '#FF6B00',
-    obstruccion: '#F2FD14',
-    saturacion: '#02D701',
-    entorno: '#14C9D9'
-  };
+    return () => clearInterval(checkInterval);
+  }, []);
 
   if (!isMounted) return <div className="w-full h-screen bg-black" />;
 
   return (
     <div className="w-full h-full relative overflow-hidden bg-white">
-      {/* Load custom styles and scripts from user */}
       <Head>
         <link rel="stylesheet" href="/principal.css" />
       </Head>
       <Script
         src="/ubicacion.js"
         strategy="afterInteractive"
-        onLoad={() => {
-          console.log("ubicacion.js loaded");
-        }}
       />
 
-      {/* Hidden button to prevent ubicacion.js crash if it tries to access it */}
       <button id="btn_dar_permisos" style={{ display: 'none' }} />
 
       <MapContainer
         id="mapa"
-        center={CDMX_CENTER}
-        zoom={13}
+        center={userPos}
+        zoom={15}
         className="w-full h-full z-50"
         zoomControl={false}
         attributionControl={false}
@@ -106,10 +110,17 @@ export function MapScreen() {
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
+        {/* User Global Position Marker */}
+        <Marker position={userPos} icon={getMarkerIcon({} as Report, true)!} />
+
+        {/* Real Reports from Script (matching script's data) */}
         {reports.map((report) => {
+          // Skip if no real coordinates provided by script
+          if (!report.lat || !report.lng) return null;
+          
           const icon = getMarkerIcon(report);
           if (!icon) return null;
 
@@ -120,23 +131,9 @@ export function MapScreen() {
               icon={icon}
             >
               <Popup className="premium-popup">
-                <div className="p-8 glass-premium rounded-[32px] border-white/30 text-white min-w-[240px] shadow-2xl">
-                  <p
-                    className="text-[12px] font-black uppercase tracking-widest mb-4 opacity-70"
-                    style={{ color: neonColors[report.type] }}
-                  >
-                    {report.type.toUpperCase()}
-                  </p>
-                  <p className="text-xl font-black leading-tight tracking-tight uppercase italic text-black">{report.linea}</p>
-                  <div className="mt-6 flex gap-2">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-2 h-6 rounded-full transition-all"
-                        style={{ backgroundColor: i < report.intensidad ? neonColors[report.type] : 'rgba(0,0,0,0.1)' }}
-                      />
-                    ))}
-                  </div>
+                <div className="p-6 glass-premium rounded-[24px] border-white/30 text-black min-w-[200px] shadow-2xl">
+                   <p className="text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">Reporte Recibido</p>
+                   <p className="text-sm font-bold leading-tight uppercase italic">{report.linea}</p>
                 </div>
               </Popup>
             </Marker>

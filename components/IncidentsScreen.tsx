@@ -36,16 +36,7 @@ export function IncidentsScreen() {
   const { reports } = useRealtimeReports();
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
 
-  const mockInitial: Incident[] = [
-    { id: 'm1', type: 'seguridad', linea: 'Línea 1 - Balderas', intensidad: 5, created_at: new Date(Date.now() - 120000).toISOString(), description: 'ALTA PRIORIDAD: PROTOCOLO DE SEGURIDAD ACTIVADO POR DETECCIÓN DE CONDUCTAS DE RIESGO EN ANDÉN ORIENTE.' },
-    { id: 'm2', type: 'emergencia', linea: 'Línea 2 - Bellas Artes', intensidad: 4, created_at: new Date(Date.now() - 300000).toISOString(), description: 'ANOMALÍA ELÉCTRICA DETECTADA EN TRANSFORMADOR B3. UNIDADES DE MANTENIMIENTO EN CAMINO.' },
-    { id: 'm3', type: 'obstruccion', linea: 'Metrobús L7 - Reforma', intensidad: 3, created_at: new Date(Date.now() - 600000).toISOString(), description: 'MOVILIDAD RESTRINGIDA POR EVENTO SOCIAL MASIVO. SE RECOMIENDAN RUTAS ALTERNAS POR AV. CHAPULTEPEC.' },
-    { id: 'm4', type: 'saturacion', linea: 'Línea 9 - Pantitlán', intensidad: 5, created_at: new Date(Date.now() - 900000).toISOString(), description: 'SATURACIÓN CRÍTICA DETECTADA. ACTIVANDO PROTOCOLO DE DOSIFICACIÓN DE USUARIOS EN ACCESOS.' },
-    { id: 'm5', type: 'entorno', linea: 'Centro Histórico', intensidad: 2, created_at: new Date(Date.now() - 1200000).toISOString(), description: 'PRECIPITACIONES DETECTADAS. POSIBLE ACUMULACIÓN PLUVIAL EN PASOS SUBTERRÁNEOS.' }
-  ];
-
-  const allReports: Incident[] = [...reports, ...(reports.length < 5 ? mockInitial.slice(0, 5 - reports.length) : [])]
-    .sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const allReports: Incident[] = [...reports].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   interface CategoryConfig {
     icon: React.ElementType;
