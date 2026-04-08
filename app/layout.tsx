@@ -34,7 +34,6 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="stylesheet" href="/principal.css" />
       </head>
       <body className={`${inter.variable} ${outfit.variable} font-sans bg-slate-950 text-white selection:bg-blue-500/30 overflow-hidden`}>
         {children}

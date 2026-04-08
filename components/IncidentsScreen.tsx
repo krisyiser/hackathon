@@ -12,7 +12,6 @@ import {
   Share2,
   CheckCircle,
   X,
-  ArrowUpRight,
   Navigation,
   Info
 } from 'lucide-react';
@@ -89,23 +88,22 @@ export function IncidentsScreen() {
 
                 <div className="relative glass-card-premium p-5 sm:p-8 rounded-[32px] sm:rounded-[44px] border-white/10 hover:border-white/20 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col gap-4 sm:gap-6 shadow-2xl w-full">
                    
-                   <div className="flex justify-between items-start gap-3 w-full">
+                   <div className="flex justify-between items-center gap-3 w-full">
                       <div className="flex-1 flex items-center gap-4 sm:gap-6 min-w-0">
                          <div className={cn("w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-[24px] flex items-center justify-center shadow-2xl relative shrink-0", config.bg, config.color)}>
                             <config.icon className="w-6 h-6 sm:w-8 sm:h-8 relative z-10" strokeWidth={3} />
                          </div>
                          <div className="flex flex-col gap-0.5 sm:gap-1 min-w-0 flex-1">
-                            <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/30">{config.label}</span>
+                            <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse">ALERTA ACTIVA</span>
                             <span className="text-lg sm:text-2xl font-black text-white tracking-tighter uppercase italic group-hover:text-cyan-400 transition-colors leading-tight break-words pr-2">
-                               {report.linea}
+                               INCIDENTE EN {report.metadata?.calle?.toUpperCase() || 'VÍA PÚBLICA'}
                             </span>
                          </div>
                       </div>
-                      <div className="flex flex-col items-end shrink-0 pt-1">
-                         <div className="px-2.5 sm:px-4 py-1 rounded-full bg-white/5 border border-white/10 mb-2 sm:mb-3">
-                            <span className="text-[8px] sm:text-[10px] font-black text-white/60 font-mono italic">{new Date(report.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                      <div className="shrink-0 pt-1">
+                         <div className="px-2.5 sm:px-4 py-1 rounded-full bg-white/5 border border-white/10">
+                            <span className="text-[10px] font-black text-cyan-400 tracking-widest font-mono italic">DETALLES</span>
                          </div>
-                         <ArrowUpRight className="w-4 h-4 sm:w-6 sm:h-6 text-white/10 group-hover:text-white transition-all hidden sm:block" strokeWidth={3} />
                       </div>
                    </div>
 
