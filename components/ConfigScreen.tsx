@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   MapPin, 
@@ -53,6 +53,22 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
     saturacion: false,
     entorno: false
   });
+
+  // Sync with global marcadores in ubicacion.js
+  useEffect(() => {
+    const activeMarkers = Object.entries(notificationPrefs)
+      .filter(([, enabled]) => enabled)
+      .map(([key]) => key);
+    
+    // Update global variable for ubicacion.js
+    (window as unknown as { marcadores: string[] }).marcadores = activeMarkers;
+    
+    // Also trigger the send if global function exists
+    const win = window as unknown as { enviarCoordenadas?: () => void };
+    if (typeof win.enviarCoordenadas === 'function') {
+      win.enviarCoordenadas();
+    }
+  }, [notificationPrefs]);
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
