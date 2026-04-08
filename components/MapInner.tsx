@@ -55,22 +55,23 @@ export default function MapInner() {
     return L.divIcon({
       className: 'custom-pin',
       html: `
-        <div style="position:relative; width:44px; height:44px;">
-          <div style="position:absolute; width:100%; height:100%; background:${color}; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:3px solid white; box-shadow:0 8px 20px rgba(0,0,0,0.3);"></div>
-          <div style="position:absolute; width:14px; height:14px; background:white; border-radius:50%; top:10px; left:15px;"></div>
+        <div style="position:relative; width:50px; height:50px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));">
+          <div style="position:absolute; width:100%; height:100%; background:${color}; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:4px solid white;"></div>
+          <div style="position:absolute; width:18px; height:18px; background:white; border-radius:50%; top:12px; left:16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);"></div>
+          <div style="position:absolute; width:60px; height:60px; background:${color}; opacity:0.2; border-radius:50%; top:-5px; left:-5px; animation: pulse-pin 2s infinite;"></div>
         </div>
       `,
-      iconSize: [44, 44],
-      iconAnchor: [22, 44]
+      iconSize: [50, 50],
+      iconAnchor: [25, 50]
     });
   };
 
   const getUserIcon = () => {
     return L.divIcon({
       className: 'user-pin',
-      html: `<div style="width:28px; height:28px; background:#3b82f6; border-radius:50%; border:4px solid white; box-shadow:0 0 25px rgba(59,130,246,0.8); animation: pulse-user 2s infinite;"></div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
+      html: `<div style="width:32px; height:32px; background:#3b82f6; border-radius:50%; border:5px solid white; box-shadow:0 0 30px rgba(59,130,246,1); animation: pulse-user 2s infinite;"></div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
     });
   };
 
@@ -97,16 +98,30 @@ export default function MapInner() {
             position={[report.lat, report.lng]} 
             icon={getMarkerIcon(report.type)}
           >
-            <Popup className="premium-map-popup">
-              <div className="flex flex-col gap-1 min-w-[220px] p-2">
-                <div className="flex justify-between items-center mb-1">
-                   <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{report.type}</span>
+            <Popup className="premium-map-popup" minWidth={280}>
+              <div className="flex flex-col gap-4 p-4 font-sans overflow-hidden">
+                <div className="flex justify-between items-start">
+                   <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse mb-1">MOVILIDAD ACTIVA</span>
+                      <h4 className="font-black text-slate-900 text-xl leading-tight uppercase italic tracking-tighter">{report.linea}</h4>
+                   </div>
                 </div>
-                <h4 className="font-bold text-slate-800 text-base leading-tight uppercase italic mb-1">{report.linea}</h4>
-                <p className="text-[10px] font-bold text-blue-500 mb-1">{report.metadata?.calle}</p>
-                {report.description && <p className="text-xs text-slate-500 leading-snug bg-slate-50 p-2 rounded-lg border border-slate-100 italic">&quot;{report.description}&quot;</p>}
-                <div className="text-[9px] font-extrabold text-slate-300 mt-2 text-right">
-                   {new Date(report.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                
+                <div className="flex flex-col gap-2 bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-inner">
+                   <div className="flex items-center gap-2 text-blue-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">{report.metadata?.calle || 'UBICACIÓN TÁCTICA'}</span>
+                   </div>
+                   <p className="text-xs text-slate-600 leading-relaxed font-medium italic">&quot;{report.description}&quot;</p>
+                </div>
+
+                <div className="flex items-center justify-between mt-1">
+                   <div className="px-3 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 text-[9px] font-black text-slate-500">
+                      ID: {report.id.toString().slice(-6).toUpperCase()}
+                   </div>
+                   <div className="text-[9px] font-black text-slate-400">
+                      SNAPSHOT: {new Date(report.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                   </div>
                 </div>
               </div>
             </Popup>
@@ -116,18 +131,30 @@ export default function MapInner() {
       <style jsx global>{`
         @keyframes pulse-user {
           0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-          70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+          70% { transform: scale(1.1); box-shadow: 0 0 0 25px rgba(59, 130, 246, 0); }
           100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
-        .leaflet-container { background: #e5e7eb !important; height: 100% !important; width: 100% !important; }
-        .premium-map-popup .leaflet-popup-content-wrapper {
-          background: rgba(255, 255, 255, 1);
-          border-radius: 20px;
-          border: 1px solid #eee;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-          padding: 6px;
+        @keyframes pulse-pin {
+          0% { transform: scale(0.5); opacity: 0.5; }
+          100% { transform: scale(1.5); opacity: 0; }
         }
-        .premium-map-popup .leaflet-popup-tip { background: white; }
+        .leaflet-container { background: #f8fafc !important; height: 100% !important; width: 100% !important; }
+        .premium-map-popup .leaflet-popup-content-wrapper {
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(20px);
+          border-radius: 32px;
+          border: 1px solid rgba(255,255,255,0.4);
+          box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25), 0 18px 36px -18px rgba(0,0,0,0.3);
+          padding: 0;
+          overflow: hidden;
+        }
+        .premium-map-popup .leaflet-popup-content { margin: 0; width: auto !important; }
+        .premium-map-popup .leaflet-popup-tip { background: white; box-shadow: none; }
+        .premium-map-popup .leaflet-popup-close-button {
+          padding: 12px !important;
+          color: #94a3b8 !important;
+          font-size: 20px !important;
+        }
       `}</style>
     </div>
   );
