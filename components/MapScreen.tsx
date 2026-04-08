@@ -79,7 +79,7 @@ export function MapScreen() {
   if (!isMounted) return <div className="w-full h-screen bg-black" />;
 
   return (
-    <div id="mapa" className="w-full h-full relative overflow-hidden bg-black">
+    <div className="w-full h-full relative overflow-hidden bg-black">
       {/* Load custom styles and scripts from user */}
       <Head>
         <link rel="stylesheet" href="/principal.css" />
@@ -96,6 +96,7 @@ export function MapScreen() {
       <button id="btn_dar_permisos" style={{ display: 'none' }} />
 
       <MapContainer
+        id="mapa"
         center={CDMX_CENTER}
         zoom={13}
         className="w-full h-full grayscale brightness-[0.5] contrast-[1.2] z-0"
