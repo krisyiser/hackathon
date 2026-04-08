@@ -5,11 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
   Heart, 
-  Share2, 
-  Plus,
   Send,
-  X,
-  CheckCircle2
+  CheckCircle2,
+  Image as ImageIcon,
+  Smile,
+  MapPin
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -21,6 +21,8 @@ function cn(...inputs: ClassValue[]) {
 interface Post {
   id: number;
   user: string;
+  handle: string;
+  avatar: string;
   content: string;
   likes: number;
   liked: boolean;
@@ -30,12 +32,41 @@ interface Post {
 
 export function CommunityScreen() {
   const [posts, setPosts] = useState<Post[]>([
-    { id: 1, user: 'Elena M.', content: 'Increíble la rapidez de respuesta en la Línea 9 hoy.', likes: 24, liked: false, replies: 2, created_at: '2m' },
-    { id: 2, user: 'Marco Polo', content: '¿Alguien sabe por qué hay tanto humo en Bellas Artes?', likes: 12, liked: true, replies: 5, created_at: '5m' },
-    { id: 3, user: 'Sara G.', content: 'Cuidado en el transbordo de Pantitlán, mucha saturación.', likes: 45, liked: false, replies: 8, created_at: '10m' },
+    { 
+      id: 1, 
+      user: 'Elena Martínez', 
+      handle: '@elena_m', 
+      avatar: 'EM',
+      content: 'Increíble la rapidez de respuesta en la Línea 9 hoy. Reporté un objeto en vías y en 3 minutos ya estaban atendiendo. ¡Gran trabajo! 🚇✨ #MetroCDMX', 
+      likes: 24, 
+      liked: false, 
+      replies: 2, 
+      created_at: '2m' 
+    },
+    { 
+      id: 2, 
+      user: 'Marco Polo', 
+      handle: '@marcopolo_df', 
+      avatar: 'MP',
+      content: '¿Alguien sabe por qué hay tanto humo en Bellas Artes?🚨⚠️', 
+      likes: 112, 
+      liked: true, 
+      replies: 15, 
+      created_at: '15m' 
+    },
+    { 
+      id: 3, 
+      user: 'Sara Guerrero', 
+      handle: '@sara_g', 
+      avatar: 'SG',
+      content: 'Cuidado en el transbordo de Pantitlán, mucha saturación en las escaleras eléctricas de la L1. Tomen precauciones. #AlertaVial', 
+      likes: 45, 
+      liked: false, 
+      replies: 8, 
+      created_at: '45m' 
+    },
   ]);
 
-  const [isPosting, setIsPosting] = useState(false);
   const [newContent, setNewContent] = useState('');
   const [showToast, setShowToast] = useState(false);
 
@@ -58,7 +89,9 @@ export function CommunityScreen() {
     
     const newPost: Post = {
       id: Date.now(),
-      user: 'Tú', // In a real app, this would be the profile name
+      user: 'Usuario Motus',
+      handle: '@tu_usuario',
+      avatar: 'TU',
       content: newContent,
       likes: 0,
       liked: false,
@@ -68,7 +101,6 @@ export function CommunityScreen() {
 
     setPosts([newPost, ...posts]);
     setNewContent('');
-    setIsPosting(false);
     triggerToast();
   };
 
@@ -78,110 +110,96 @@ export function CommunityScreen() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-transparent px-8 pt-40 pb-48 no-scrollbar relative">
+    <div className="flex-1 overflow-y-auto bg-black pt-24 sm:pt-28 pb-48 no-scrollbar relative font-sans">
       
-      {/* Header & Post Trigger */}
-      <div className="mb-16 flex items-center justify-between">
-        <div className="flex flex-col">
-          <h2 className="text-[12px] font-black text-white/40 uppercase tracking-[0.4em] mb-2">Voz Global</h2>
-          <p className="text-4xl font-extrabold text-white tracking-tighter uppercase italic leading-none">Pulso Comunidad</p>
+      {/* Header (Responsive Minimal) */}
+      <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/5 px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between">
+        <h2 className="text-xl sm:text-2xl font-black text-white italic tracking-tighter uppercase">Pulso Urbano</h2>
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full glass-premium flex items-center justify-center text-blue-400">
+           <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
-        <button 
-          onClick={() => setIsPosting(true)}
-          className="w-16 h-16 rounded-3xl glass-premium flex items-center justify-center text-cyan-400 border-cyan-500/20 hover:scale-110 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
-        >
-           <Plus className="w-8 h-8" strokeWidth={3} />
-        </button>
       </div>
 
-      {/* New Post Modal */}
-      <AnimatePresence>
-        {isPosting && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] flex items-center justify-center px-6 bg-black/80 backdrop-blur-md"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="w-full max-w-lg glass-card-premium p-8 rounded-[48px] border-white/20"
-            >
-               <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-xl font-black text-white tracking-tight">Nuevo Mensaje</h3>
-                  <button onClick={() => setIsPosting(false)} className="text-white/40 hover:text-white">
-                     <X className="w-6 h-6" />
-                  </button>
-               </div>
-               
-               <textarea 
-                 value={newContent}
-                 onChange={(e) => setNewContent(e.target.value)}
-                 placeholder="¿Qué está pasando en la red?"
-                 className="w-full h-40 bg-white/5 rounded-3xl p-6 text-white placeholder:text-white/20 border-none outline-none focus:ring-1 focus:ring-cyan-500/50 resize-none font-medium mb-8"
-                 autoFocus
-               />
+      {/* INLINE COMPOSER Responsive */}
+      <div className="p-5 sm:p-8 border-b border-white/5 relative">
+        <div className="flex gap-4 sm:gap-6">
+           <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white shrink-0 border border-white/10 text-xs sm:text-base">
+             TU
+           </div>
 
-               <button 
-                 onClick={handlePublish}
-                 className="w-full py-6 bg-cyan-500 rounded-3xl text-black font-black uppercase tracking-[0.4em] flex items-center justify-center gap-3 hover:bg-cyan-400 transition-all active:scale-[0.98]"
-               >
-                  <Send className="w-6 h-6" strokeWidth={3} />
+           <div className="flex-1">
+             <div className="relative rounded-[24px] sm:rounded-[32px] transition-all duration-500 p-[1px] sm:p-[2px] overflow-hidden bg-gradient-to-tr from-blue-600/40 via-blue-400/20 to-cyan-400/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+                <div className="bg-black rounded-[23px] sm:rounded-[30px] p-4 sm:p-6">
+                   <textarea 
+                     value={newContent}
+                     onChange={(e) => setNewContent(e.target.value)}
+                     placeholder="¿Qué está pasando?"
+                     className="w-full bg-transparent text-lg sm:text-xl text-white placeholder:text-white/20 border-none outline-none focus:ring-0 resize-none font-medium no-scrollbar min-h-[60px] sm:min-h-[100px]"
+                   />
+                </div>
+                <div className="absolute inset-0 pointer-events-none blur-2xl bg-blue-500/5 animate-pulse" />
+             </div>
+             
+             <div className="flex items-center justify-between pt-4 sm:pt-6 mt-2">
+                <div className="flex gap-4 sm:gap-6 text-blue-400 opacity-60">
+                   <button className="hover:text-blue-300 transition-colors"><ImageIcon className="w-5 h-5 sm:w-6 sm:h-6" /></button>
+                   <button className="hover:text-blue-300 transition-colors"><Smile className="w-5 h-5 sm:w-6 sm:h-6" /></button>
+                </div>
+                <button 
+                  onClick={handlePublish}
+                  className="px-6 sm:px-10 py-2.5 sm:py-4 bg-[#007AFF] text-white font-black rounded-full text-xs sm:text-base transition-all active:scale-95 uppercase tracking-widest shadow-[0_0_30px_rgba(0,122,255,0.4)]"
+                >
                   Publicar
-               </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                </button>
+             </div>
+           </div>
+        </div>
+      </div>
 
-      {/* Posts Feed */}
-      <div className="space-y-8">
+      {/* Feed Responsive */}
+      <div className="flex flex-col">
         {posts.map((post, idx) => (
           <motion.div
             key={post.id}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="glass-card-premium p-8 rounded-[48px] border-white/5 relative group overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="border-b border-white/5 p-5 sm:p-8 transition-colors cursor-pointer group hover:bg-white/[0.01]"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-cyan-500/10 transition-colors" />
-            
-            <div className="flex flex-col gap-6 relative">
-              <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-rose-500 p-0.5">
-                    <div className="w-full h-full rounded-[14px] bg-black flex items-center justify-center text-[10px] font-black text-white">
-                       {post.user.charAt(0)}
-                    </div>
-                 </div>
-                 <div className="flex flex-col">
-                    <span className="text-lg font-black text-white tracking-tight">{post.user}</span>
-                    <span className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">{post.created_at} atrás</span>
-                 </div>
+            <div className="flex gap-4 sm:gap-6">
+              <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full bg-slate-950 flex items-center justify-center text-[10px] sm:text-xs font-black border border-white/5 text-white shrink-0 overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent" />
+                {post.avatar}
               </div>
 
-              <p className="text-xl font-bold text-white/80 leading-relaxed tracking-tight">
-                &ldquo;{post.content}&rdquo;
-              </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                  <span className="font-black text-white text-base sm:text-lg tracking-tight truncate">{post.user}</span>
+                  <span className="text-white/20 text-xs sm:text-sm">·</span>
+                  <span className="text-white/20 text-[10px] sm:text-sm font-bold">{post.created_at}</span>
+                </div>
 
-              <div className="flex items-center gap-8 pt-4 border-t border-white/5">
-                 <button 
-                   onClick={() => handleLike(post.id)}
-                   className="flex items-center gap-3 group/btn transition-all active:scale-90"
-                 >
-                    <Heart className={cn("w-6 h-6 transition-all", post.liked ? "text-rose-500 fill-rose-500" : "text-white/20 group-hover/btn:text-rose-500")} />
-                    <span className={cn("text-sm font-black transition-all", post.liked ? "text-white" : "text-white/40")}>{post.likes}</span>
-                 </button>
-                 
-                 <button className="flex items-center gap-3 group/btn">
-                    <MessageCircle className="w-6 h-6 text-white/20 group-hover/btn:text-cyan-400 transition-colors" />
-                    <span className="text-sm font-black text-white/40 group-hover/btn:text-white transition-colors">{post.replies}</span>
-                 </button>
-                 
-                 <button className="ml-auto">
-                    <Share2 className="w-6 h-6 text-white/10 hover:text-white transition-colors" />
-                 </button>
+                <p className="text-base sm:text-[19px] text-white/90 leading-relaxed mb-4 sm:mb-6 font-medium whitespace-pre-wrap">
+                  {post.content}
+                </p>
+
+                <div className="flex items-center gap-8 sm:gap-14 text-white/30">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleLike(post.id); }}
+                    className={cn("flex items-center gap-2 sm:gap-4 group/icon transition-all active:scale-90", post.liked ? "text-rose-500" : "hover:text-rose-500")}
+                  >
+                    <div className={cn("p-2 sm:p-4 rounded-full transition-all", post.liked ? "bg-rose-500/10 scale-110" : "group-hover/icon:bg-rose-500/10")}>
+                      <Heart className={cn("w-5 h-5 sm:w-6 sm:h-6", post.liked && "fill-rose-500")} />
+                    </div>
+                    <span className="text-xs sm:text-md font-black">{post.likes}</span>
+                  </button>
+
+                  <button className="flex items-center gap-2 sm:gap-4 group/icon hover:text-blue-400 transition-colors">
+                    <div className="p-2 sm:p-4 rounded-full group-hover/icon:bg-blue-400/10 transition-colors">
+                      <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </div>
+                    <span className="text-xs sm:text-md font-black">{post.replies}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -195,10 +213,10 @@ export function CommunityScreen() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[400] glass-premium px-8 py-4 rounded-full border-cyan-500/30 flex items-center gap-3"
+            className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[400] bg-[#007AFF] text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full flex items-center gap-3 sm:gap-4 shadow-[0_0_50px_rgba(0,122,255,0.4)] font-black uppercase text-[10px] sm:text-sm tracking-[0.2em]"
           >
-             <CheckCircle2 className="w-5 h-5 text-cyan-400" />
-             <span className="text-xs font-black text-white uppercase tracking-widest">Mensaje Enviado</span>
+             <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
+             Transmitido
           </motion.div>
         )}
       </AnimatePresence>

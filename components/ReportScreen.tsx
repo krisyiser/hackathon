@@ -29,6 +29,7 @@ export function ReportScreen() {
   const [isPressing, setIsPressing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<IncidentType | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [ripples, setRipples] = useState<{ id: string; x: number; y: number; delay: number }[]>([]);
   const { startListening, isListening } = useVoiceReport();
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const lastTapTime = useRef<number>(0);
@@ -48,7 +49,29 @@ export function ReportScreen() {
     { id: 'entorno' as IncidentType, icon: Leaf, label: 'ENTORNO', color: '#14C9D9', angle: 200 },
   ];
 
-  const handlePointerDown = () => {
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.cancelable) e.preventDefault();
+    
+    // Generate Multiple Concentric Ripples
+    const centerX = e.clientX;
+    const centerY = e.clientY;
+    const batchId = Date.now();
+    
+    const newRipples = [0, 150, 300].map((delay, i) => ({
+      id: `${batchId}-${i}`,
+      x: centerX,
+      y: centerY,
+      delay: delay / 1000
+    }));
+
+    setRipples(prev => [...prev, ...newRipples]);
+    
+    setTimeout(() => {
+      setRipples(prev => prev.filter(r => !newRipples.find(nr => nr.id === r.id)));
+    }, 2000);
+
+    if (navigator.vibrate) navigator.vibrate(30);
+
     const now = Date.now();
     const DOUBLE_TAP_DELAY = 300;
 
@@ -94,10 +117,35 @@ export function ReportScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-10">
+    <div className="flex-1 flex flex-col items-center justify-center px-10 select-none overflow-hidden touch-none">
       
+      {/* Fullscreen Ripple Layer */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatePresence>
+          {ripples.map(ripple => (
+            <motion.div
+              key={ripple.id}
+              initial={{ scale: 0, opacity: 0.5 }}
+              animate={{ scale: 15, opacity: 0 }}
+              transition={{ 
+                duration: 1.5, 
+                delay: ripple.delay,
+                ease: "easeOut"
+              }}
+              className="absolute rounded-full border-[2px] border-rose-500/30"
+              style={{
+                width: 100,
+                height: 100,
+                left: ripple.x - 50,
+                top: ripple.y - 50,
+                boxShadow: '0 0 40px rgba(242, 19, 20, 0.2)'
+              }}
+            />
+          ))}
+        </AnimatePresence>
+      </div>
 
-      <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center">
+      <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10">
         
         {/* Ambient Radial Background */}
         <div className={cn(
@@ -165,10 +213,11 @@ export function ReportScreen() {
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           className={cn(
-            "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-700 flex items-center justify-center overflow-hidden active:scale-95 group",
+            "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-700 flex items-center justify-center overflow-hidden active:scale-95 group select-none touch-none",
             isPressing ? "bg-white/20 scale-[0.85] shadow-[0_0_100px_rgba(255,255,255,0.2)]" : "glass-premium hover:bg-white/10",
             isListening && "border-rose-500 shadow-[0_0_60px_rgba(242,19,20,0.4)]"
           )}
+          style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
         >
           {showSuccess ? (
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex flex-col items-center">
@@ -198,7 +247,7 @@ export function ReportScreen() {
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute -bottom-24 z-10 text-[13px] font-black uppercase tracking-[0.4em] text-white opacity-60 text-center whitespace-pre-wrap leading-relaxed"
+              className="absolute -bottom-24 z-10 text-[13px] font-black uppercase tracking-[0.4em] text-white opacity-60 text-center whitespace-pre-wrap leading-relaxed select-none"
             >
               {isListening ? "Escuchando Voz..." : "Mantén: Reporte\n2 Toques: Voz"}
             </motion.div>
@@ -206,7 +255,7 @@ export function ReportScreen() {
         </AnimatePresence>
       </div>
 
-      <div className="mt-24 flex flex-col items-center">
+      <div className="mt-24 flex flex-col items-center select-none">
          <div className="flex gap-3 mb-4">
             {[...Array(5)].map((_,i) => <div key={i} className="w-2 h-2 bg-white rounded-full opacity-40 shadow-xl" />)}
          </div>
