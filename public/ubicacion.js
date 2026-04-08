@@ -89,7 +89,7 @@ function enviarCoordenadas() {
     formData.append("longitud", lng_global)
     formData.append("marcadores", marcadores)
 
-    fetch("controlador/recibir_ubicacion.php", { method: "POST", body: formData })
+    fetch("https://lookitag.com/motus/controlador/recibir_ubicacion.php", { method: "POST", body: formData })
         .then(r => r.ok ? r.text() : Promise.reject("Error en la petición"))
         .then(body => {
             if (!body.includes("error")) {
