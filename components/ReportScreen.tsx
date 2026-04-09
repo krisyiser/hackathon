@@ -318,24 +318,24 @@ export function ReportScreen() {
               {/* CATEGORY SELECTOR TACTICAL */}
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-[1px] bg-rose-500" />
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Tipo de Incidente</label>
+                  <div className="w-8 h-[1px] bg-emerald-400" />
+                  <label className="text-[10px] font-black text-white/90 uppercase tracking-[0.3em]">Tipo de Incidente</label>
                 </div>
-                <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
+                <div className="flex justify-between items-start w-full gap-2">
                   {categories.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setFormData(prev => ({ ...prev, tipo: cat.id }))}
                       className={cn(
-                        "shrink-0 w-24 h-24 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all duration-500 overflow-hidden relative",
-                        formData.tipo === cat.id ? "glass-premium border-white/30 scale-105" : "bg-white/5 border border-transparent opacity-50 grayscale"
+                        "relative flex-1 aspect-[3/4] max-h-[100px] rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-300",
+                        formData.tipo === cat.id ? "glass-premium border-2 border-white scale-105 shadow-2xl" : "bg-white/10 border border-white/30 opacity-80"
                       )}
                     >
                       {formData.tipo === cat.id && (
-                        <motion.div layoutId="glow" className="absolute inset-0 blur-2xl opacity-40" style={{ backgroundColor: cat.color }} />
+                        <motion.div layoutId="glow" className="absolute inset-0 blur-xl opacity-60" style={{ backgroundColor: cat.color }} />
                       )}
-                      <cat.icon className="w-8 h-8 relative z-10" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} />
-                      <span className="text-[9px] font-black tracking-widest uppercase text-white relative z-10">{cat.id}</span>
+                      <cat.icon className="w-5 h-5 sm:w-7 sm:h-7 relative z-10" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} strokeWidth={3} />
+                      <span className="text-[7px] sm:text-[9px] font-black tracking-widest uppercase text-white relative z-10 truncate w-full px-1 text-center">{cat.id}</span>
                     </button>
                   ))}
                 </div>
@@ -345,32 +345,32 @@ export function ReportScreen() {
               <div className="space-y-10">
                 <div className="relative group">
                   <label className={cn(
-                    "absolute left-6 transition-all font-black text-[9px] uppercase tracking-[0.3em]",
-                    formData.titulo ? "-top-3 text-rose-500" : "top-5 text-white/20"
+                    "absolute left-6 transition-all font-black text-[10px] uppercase tracking-[0.3em] z-10 px-2 bg-black/60 rounded-full",
+                    formData.titulo ? "-top-3 text-cyan-400" : "top-5 text-white/80"
                   )}>Título del Suceso</label>
-                  <div className="rounded-[32px] glass-premium p-1 border-2 border-white/10 focus-within:border-rose-500 bg-white/5 transition-all">
+                  <div className="rounded-[32px] glass-premium p-1 border-2 border-white/30 focus-within:border-cyan-400 bg-white/10 transition-all relative">
                     <input 
                       type="text" 
                       value={formData.titulo}
                       onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
                       placeholder={formData.titulo ? "" : "Identifique el incidente..."} 
-                      className="w-full bg-black/40 rounded-[28px] px-6 py-5 text-lg text-white placeholder:text-white/30 outline-none font-bold italic"
+                      className="w-full bg-black/50 rounded-[28px] px-6 py-5 text-lg text-white placeholder:text-white/60 outline-none font-bold italic"
                     />
                   </div>
                 </div>
 
                 <div className="relative group">
                   <label className={cn(
-                    "absolute left-6 transition-all font-black text-[9px] uppercase tracking-[0.3em]",
-                    formData.descripcion ? "-top-3 text-rose-500" : "top-5 text-white/20"
+                    "absolute left-6 transition-all font-black text-[10px] uppercase tracking-[0.3em] z-10 px-2 bg-black/60 rounded-full",
+                    formData.descripcion ? "-top-3 text-cyan-400" : "top-5 text-white/80"
                   )}>Bitácora de Detalles</label>
-                  <div className="rounded-[32px] glass-premium p-1 border-2 border-white/10 focus-within:border-rose-500 bg-white/5 transition-all">
+                  <div className="rounded-[32px] glass-premium p-1 border-2 border-white/30 focus-within:border-cyan-400 bg-white/10 transition-all relative">
                     <textarea 
                       value={formData.descripcion}
                       onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
                       placeholder={formData.descripcion ? "" : "Relate los hechos observados..."} 
                       rows={5}
-                      className="w-full bg-black/40 rounded-[28px] px-6 py-5 text-white placeholder:text-white/30 outline-none font-medium resize-none leading-relaxed"
+                      className="w-full bg-black/50 rounded-[28px] px-6 py-5 text-white placeholder:text-white/60 outline-none font-medium resize-none leading-relaxed"
                     />
                   </div>
                 </div>
@@ -379,8 +379,8 @@ export function ReportScreen() {
               {/* CAMERA INTERFACE */}
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-[1px] bg-rose-500" />
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Captura de Evidencia</label>
+                  <div className="w-8 h-[1px] bg-emerald-400" />
+                  <label className="text-[10px] font-black text-white/90 uppercase tracking-[0.3em]">Captura de Evidencia</label>
                 </div>
                 <div className="relative aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-white/5 group transition-all active:scale-[0.98]">
                   <input type="file" accept="image/*" capture="environment" className="absolute inset-0 opacity-0 z-20 cursor-pointer" onChange={handleFileChange} />
@@ -417,16 +417,15 @@ export function ReportScreen() {
               </div>
             </div>
 
-              <div className="w-full pb-8 pt-4">
+            <div className="w-full pb-32 px-6 pt-8 z-20">
                  <button 
                   onClick={() => submitReport(formData)}
-                  className="w-full h-20 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(225,29,72,0.4)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
+                  className="w-full h-20 bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(16,185,129,0.3)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
                 >
-                  <div className="flex items-center gap-4">
-                    <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
+                  <div className="flex items-center gap-4 text-base">
+                    <Send className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" strokeWidth={3} /> 
                     ENVIAR
                   </div>
-                  <ChevronRight className="w-6 h-6 opacity-40" />
                 </button>
               </div>
           </motion.div>
