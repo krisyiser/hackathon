@@ -3,191 +3,173 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const PATHS = [
-  // M: Rose
-  { color: "#FF2D55", d: "M 20 140 L 40 40 L 60 110 L 80 40 L 100 140" },
-  // O: Orange/Gold
-  { color: "#FF9F0A", d: "M 100 140 C 100 80, 160 80, 160 120 C 160 160, 100 160, 100 120 C 100 100, 150 90, 180 90" },
-  // T: Cyan
-  { color: "#32ADE6", d: "M 150 90 L 230 90 M 190 90 L 190 150" },
-  // U: Green
-  { color: "#34C759", d: "M 240 90 L 240 130 C 240 160, 300 160, 300 130 L 300 90" },
-  // S: Blue
-  { color: "#007AFF", d: "M 350 90 C 310 90, 310 120, 330 120 C 350 120, 350 150, 310 150" }
-];
-
 export function SplashScreen({ onComplete }: { onComplete: () => void }) {
   const [isFinished, setIsFinished] = useState(false);
+
+  // PRECISE CONTINUOUS PATH (M-O-T-U-S)
+  const MASTER_PATH = 
+    "M 15 140 L 35 40 L 55 110 L 75 40 L 95 140 " + // M
+    "C 95 80, 155 80, 155 120 C 155 160, 95 160, 95 120 C 95 100, 145 90, 175 90 " + // O
+    "L 215 90 M 195 90 L 195 140 " + // T
+    "L 235 90 L 235 120 A 25 25 0 0 0 285 120 L 285 90 " + // U
+    "L 345 90 C 315 90, 315 115, 330 115 C 345 115, 345 140, 315 140"; // S
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsFinished(true);
-      setTimeout(onComplete, 1500);
+      setTimeout(onComplete, 1800);
     }, 5500);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
     <div className="fixed inset-0 z-[1000] bg-[#020202] flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] to-black" />
+      {/* Background Depth */}
+      <div className="absolute inset-0 bg-[#050505]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_#111_0%,_#000_100%)] opacity-50" />
       
-      {/* Dynamic Lighting Background */}
+      {/* Dynamic Ambient Reflections */}
       <motion.div 
-        animate={{ opacity: [0.1, 0.15, 0.1] }}
-        transition={{ duration: 4, repeat: Infinity }}
-        className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]"
+        animate={{ opacity: isFinished ? 0.3 : 0.05 }}
+        className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.08)_0%,_transparent_70%)] transition-opacity duration-1000"
       />
 
-      {/* MOTUS Hyper-Realistic Neon Sign */}
+      {/* CONTINUOUS NEON MASTER LOGO */}
       <div className="relative w-full max-w-4xl px-4 sm:px-12 flex items-center justify-center -mt-10">
         <svg 
-          viewBox="-10 20 400 160" 
-          className="w-full h-auto overflow-visible select-none"
+          viewBox="0 25 360 150" 
+          className="w-full h-auto overflow-visible select-none drop-shadow-2xl"
         >
           <defs>
-            <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
+            <linearGradient id="neonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FF2D55" />
+              <stop offset="25%" stopColor="#FF9F0A" />
+              <stop offset="50%" stopColor="#32ADE6" />
+              <stop offset="75%" stopColor="#34C759" />
+              <stop offset="100%" stopColor="#007AFF" />
+            </linearGradient>
+            
+            <filter id="real-neon" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.5" result="blur1" />
+              <feGaussianBlur stdDeviation="4" result="blur2" />
+              <feGaussianBlur stdDeviation="12" result="blur3" />
               <feMerge>
-                <feMergeNode in="blur" />
+                <feMergeNode in="blur3" />
+                <feMergeNode in="blur2" />
+                <feMergeNode in="blur1" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
           </defs>
 
-          {PATHS.map((path, i) => {
-            const transition = { 
-              duration: 1.8, 
-              delay: i * 0.8, 
-              ease: [0.25, 0.1, 0.25, 1] 
-            };
-            
-            return (
-              <g key={i}>
-                {/* Layer 1: Expansive Bloom */}
-                <motion.path
-                  d={path.d}
-                  fill="none"
-                  stroke={path.color}
-                  strokeWidth="28"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.12 }}
-                  transition={transition}
-                  style={{ filter: 'blur(24px)' }}
-                />
-                
-                {/* Layer 2: Tight Core Glow */}
-                <motion.path
-                  d={path.d}
-                  fill="none"
-                  stroke={path.color}
-                  strokeWidth="16"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.6 }}
-                  transition={transition}
-                  style={{ filter: 'blur(6px)' }}
-                />
+          {/* LAYER 1: Ultra-Soft Ambient Glow */}
+          <motion.path
+            d={MASTER_PATH}
+            fill="none"
+            stroke="url(#neonGradient)"
+            strokeWidth="30"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.1 }}
+            transition={{ duration: 5, ease: "linear" }}
+            style={{ filter: "blur(30px)" }}
+          />
 
-                {/* Layer 3: Physical Tube Boundary */}
-                <motion.path
-                  d={path.d}
-                  fill="none"
-                  stroke={path.color}
-                  strokeWidth="12"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ 
-                    pathLength: 1, 
-                    opacity: 1,
-                    strokeWidth: isFinished ? [12, 12.5, 12] : 12,
-                  }}
-                  transition={{
-                    ...transition,
-                    strokeWidth: { duration: 0.1, repeat: Infinity, repeatType: "reverse" }
-                  }}
-                  style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}
-                />
+          {/* LAYER 2: Primary Neon Halo */}
+          <motion.path
+            d={MASTER_PATH}
+            fill="none"
+            stroke="url(#neonGradient)"
+            strokeWidth="16"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.5 }}
+            transition={{ duration: 5, ease: "linear" }}
+            style={{ filter: "blur(8px)" }}
+          />
 
-                {/* Layer 4: Road Mask (Creates the 2 paths) */}
-                <motion.path
-                  d={path.d}
-                  fill="none"
-                  stroke="#020202"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={transition}
-                />
+          {/* LAYER 3: Outer Shell (The Road Sides) */}
+          <motion.path
+            d={MASTER_PATH}
+            fill="none"
+            stroke="url(#neonGradient)"
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ 
+              pathLength: 1, 
+              opacity: isFinished ? [1, 0.9, 1, 0.95, 1] : 1 
+            }}
+            transition={{ 
+              pathLength: { duration: 5, ease: "linear" },
+              opacity: { repeat: Infinity, duration: 0.2 }
+            }}
+            style={{ filter: "url(#real-neon)" }}
+          />
 
-                {/* Layer 5: Intermediate Divider Line (THE ONE INTERNAL LINE) */}
-                <motion.path
-                  d={path.d}
-                  fill="none"
-                  stroke={path.color}
-                  strokeWidth="1.5"
-                  strokeLinecap="butt" // Prevents starting dots
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ 
-                    pathLength: 1, 
-                    opacity: [0, 0, 1], // Flicks on at end of drawing
-                  }}
-                  transition={{
-                    ...transition,
-                    opacity: { times: [0, 0.8, 1], duration: 1.8 + i * 0.8 }
-                  }}
-                />
-              </g>
-            );
-          })}
+          {/* LAYER 4: Dark Inner (creates the lane gap) */}
+          <motion.path
+            d={MASTER_PATH}
+            fill="none"
+            stroke="#020202"
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 5, ease: "linear" }}
+          />
+
+          {/* LAYER 5: CENTER INTERMEDIATE LINE (THE CORE) */}
+          <motion.path
+            d={MASTER_PATH}
+            fill="none"
+            stroke="#FFFFFF"
+            strokeWidth="1.5"
+            strokeLinecap="butt"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: [0, 0, 1] }}
+            transition={{ 
+              pathLength: { duration: 5, ease: "linear" },
+              opacity: { times: [0, 0.9, 1], duration: 5.5 }
+            }}
+            style={{ mixBlendMode: 'plus-lighter' }}
+          />
         </svg>
 
+        {/* Ending Flare */}
         <AnimatePresence>
           {isFinished && (
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute inset-0 bg-white/[0.02] blur-[120px] rounded-full pointer-events-none"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1.5 }}
+              className="absolute inset-0 bg-white/5 blur-[150px] rounded-full pointer-events-none"
             />
           )}
         </AnimatePresence>
       </div>
 
-      {/* Progress Info */}
+      {/* Loading Context */}
       <motion.div 
-        className="absolute bottom-20 flex flex-col items-center gap-6"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        className="absolute bottom-20 flex flex-col items-center gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
       >
-        <div className="flex flex-col items-center gap-2">
-           <motion.span 
-             animate={{ opacity: [0.3, 0.6, 0.3] }}
-             transition={{ duration: 2, repeat: Infinity }}
-             className="text-[9px] font-black text-white uppercase tracking-[0.8em] ml-[0.8em]"
-           >
-             {isFinished ? 'STATUS: ONLINE' : 'AUTODIAGNÓSTICO INICIAL'}
-           </motion.span>
-        </div>
-        
-        <div className="h-0.5 w-[240px] bg-white/5 rounded-full overflow-hidden relative border border-white/5">
-          <motion.div 
-            className="h-full absolute left-0 top-0"
-            style={{ 
-              backgroundColor: '#32ADE6',
-              boxShadow: '0 0 15px #32ADE6'
-            }}
-            initial={{ width: '0%' }}
-            animate={{ width: '100%' }}
-            transition={{ duration: 5.5, ease: "easeInOut" }}
-          />
+        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.6em] italic animate-pulse">
+            Sincronizando Módulos de Movilidad
+        </span>
+        <div className="h-0.5 w-48 bg-white/5 rounded-full overflow-hidden">
+             <motion.div 
+                className="h-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"
+                initial={{ width: 0 }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 5, ease: "linear" }}
+             />
         </div>
       </motion.div>
     </div>
