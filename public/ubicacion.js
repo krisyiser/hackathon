@@ -2,6 +2,9 @@ let map = null
 let infoWindowMapa = null
 let marcadorUsuario = null
 let marcadoresReportesMapa = []
+let directionsService = null
+let directionsRenderer = null
+let marcadorDestino = null
 
 let lat_global = null
 let lng_global = null
@@ -51,6 +54,24 @@ async function initMap() {
         })
 
         infoWindowMapa = new google.maps.InfoWindow()
+        
+        // Inicializar servicios de ruta
+        directionsService = new google.maps.DirectionsService()
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            suppressMarkers: false,
+            polylineOptions: {
+                strokeColor: "#32ADE6",
+                strokeWeight: 6,
+                strokeOpacity: 0.8
+            }
+        })
+        directionsRenderer.setMap(map)
+
+        // Evento de clic para destino
+        map.addListener("click", (e) => {
+            const destino = e.latLng
+            establecerDestino(destino)
+        })
 
         try {
             const ubicacion = await pedirUbicacion()
@@ -367,4 +388,57 @@ function crearIconoMarcador(color) {
         scaledSize: new google.maps.Size(42, 42),
         anchor: new google.maps.Point(21, 42)
     }
+}
+
+function establecerDestino(latLng) {
+    if (marcadorDestino) {
+        marcadorDestino.setPosition(latLng)
+    } else {
+        marcadorDestino = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            icon: {
+                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            },
+            title: "Destino"
+        })
+    }
+
+    if (lat_global && lng_global) {
+        calcularRuta(
+            { lat: lat_global, lng: lng_global },
+            latLng
+        )
+    }
+}
+
+function calcularRuta(origen, destino) {
+    const request = {
+        origin: origen,
+        destination: destino,
+        travelMode: google.maps.TravelMode.DRIVING
+    }
+
+    directionsService.route(request, (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(result)
+            
+            // Mostrar info de tiempo/distancia
+            const route = result.routes[0].legs[0]
+            console.log(`Ruta óptima calculada: ${route.distance.text}, ${route.duration.text}`)
+            
+            infoWindowMapa.setContent(`
+                <div style="padding:10px; font-family:sans-serif;">
+                    <strong style="color:#007AFF; display:block; margin-bottom:5px;">RUTA ÓPTIMA DETECTADA</strong>
+                    <div style="font-size:12px; color:#444;">
+                        Distancia: <b>${route.distance.text}</b><br>
+                        Tiempo estimado: <b>${route.duration.text}</b>
+                    </div>
+                </div>
+            `)
+            infoWindowMapa.open(map, marcadorDestino)
+        } else {
+            console.error("No se pudo calcular la ruta:", status)
+        }
+    })
 }
