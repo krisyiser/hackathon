@@ -101,6 +101,10 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
       setDemoMode(newState);
       localStorage.setItem('motus_demo_mode', newState.toString());
       setTapCount(0);
+      
+      const win = window as unknown as { enviarCoordenadas?: () => void };
+      if (typeof win.enviarCoordenadas === 'function') win.enviarCoordenadas();
+      
       if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
       alert(newState ? "MODO DEMO ACTIVADO (OFFLINE SIM)" : "MODO REAL ACTIVADO (LIVE SERVER)");
     } else {

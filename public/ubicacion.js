@@ -217,10 +217,14 @@ function enviarCoordenadas() {
     formData.append("longitud", lng_global)
     formData.append("marcadores", marcadores)
 
-    fetch("https://lookitag.com/motus/controlador/recibir_ubicacion.php", {
-        method: "POST",
-        body: formData
-    })
+    const isDemoMode = localStorage.getItem('motus_demo_mode') === 'true';
+    const targetUrl = isDemoMode 
+        ? "/demo_reports.json" 
+        : "https://lookitag.com/motus/controlador/recibir_ubicacion.php";
+
+    const fetchOptions = isDemoMode ? { method: "GET" } : { method: "POST", body: formData };
+
+    fetch(targetUrl, fetchOptions)
     .then(r => r.ok ? r.text() : Promise.reject("Error en la petición"))
     .then(body => {
         console.log("Respuesta backend:", body)
@@ -264,17 +268,21 @@ function pintarReportesEnMapa(datos) {
         }
     }
 
-    for (let objeto of datos) {
+    const tipologiasDemo = ["seguridad", "emergencia", "obstruccion", "saturacion", "entorno"]
+    datos.forEach((objeto, index) => {
         const lat = Number(objeto.lat)
         const lng = Number(objeto.lng)
 
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-            continue
+            return
         }
 
         const posicion = { lat, lng }
 
-        const tipo = objeto.tipo || objeto.tipo_alerta || objeto.categoria || ""
+        let tipo = objeto.tipo || objeto.tipo_alerta || objeto.categoria || ""
+        if (!tipo) {
+            tipo = tipologiasDemo[index % tipologiasDemo.length]
+        }
         const colorMarcador = obtenerColorMarcador(tipo)
 
         const titulo = objeto.titulo || "Sin título"
@@ -319,7 +327,7 @@ function pintarReportesEnMapa(datos) {
         marcadoresReportesMapa.push(marker)
         bounds.extend(posicion)
         hayElementos = true
-    }
+    })
 
     if (hayElementos) {
         map.fitBounds(bounds)

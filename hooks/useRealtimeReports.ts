@@ -19,10 +19,14 @@ export function useRealtimeReports() {
         console.log("DEMO MODE ACTIVE: Loading simulated tactical data...");
         const demoResponse = await fetch("/demo_reports.json");
         const demoData = await demoResponse.json();
+        
+        const types = ['seguridad', 'emergencia', 'obstruccion', 'saturacion', 'entorno'];
+        
         const mappedReports: Report[] = demoData.map((item: any, index: number) => ({
           id: `demo-${index}-${Date.now()}`,
           created_at: item.fecha || new Date().toISOString(),
-          type: item.tipo?.toLowerCase() || 'entorno',
+          // Si no tiene tipo, asignar uno aleatorio para que se vea variado en el mapa
+          type: item.tipo?.toLowerCase() || types[index % types.length],
           linea: item.titulo || 'Simulación Motus',
           description: item.descripcion || 'Dato simulado para demostración.',
           intensidad: 3,
