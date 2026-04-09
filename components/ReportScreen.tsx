@@ -13,8 +13,7 @@ import {
   Plus,
   Camera,
   X,
-  Send,
-  FileText
+  Send
 } from 'lucide-react';
 import { IncidentType } from '@/types';
 import { useVoiceReport } from '@/hooks/useVoiceReport';
