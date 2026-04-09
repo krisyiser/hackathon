@@ -442,9 +442,8 @@ function reporteVialidad() {
     .then(body => {
         if (!body.toLowerCase().includes("error")) {
             str_reporte_vialidad = body
-            // Actualizar HUD si existe
-            const hud = document.getElementById("hud-vialidad")
-            if (hud) hud.innerHTML = body
+            // Emitir evento para que React lo capture
+            window.dispatchEvent(new CustomEvent('vialidad-update', { detail: body }))
         }
     })
     .catch(err => console.error("Error vialidad:", err))
