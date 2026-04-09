@@ -122,8 +122,7 @@ export function ReportScreen() {
     const reportData = {
       lat: win.lat_global || 19.4326,
       lng: win.lng_global || -99.1332,
-      tipo: type,
-      descripcion: description || `Reporte de ${type} vía MOTUS Dial`,
+      tipo: type
     };
 
     setShowSuccess(true);
