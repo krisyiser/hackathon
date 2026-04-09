@@ -4,16 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PATHS = [
-  // M: Pink/Rose
-  { color: "#FF3366", d: "M 20 140 L 40 40 L 60 110 L 80 40 L 100 140" },
-  // O: Yellow/Gold - Passes under to T
-  { color: "#FFCC00", d: "M 100 140 C 100 80, 160 80, 160 120 C 160 160, 100 160, 100 120 C 100 100, 150 90, 180 90" },
-  // T: Cyan - Header passes top
-  { color: "#00CCFF", d: "M 150 90 L 230 90 M 190 90 L 190 150" },
+  // M: Rose
+  { color: "#FF2D55", d: "M 20 140 L 40 40 L 60 110 L 80 40 L 100 140" },
+  // O: Orange/Gold
+  { color: "#FF9F0A", d: "M 100 140 C 100 80, 160 80, 160 120 C 160 160, 100 160, 100 120 C 100 100, 150 90, 180 90" },
+  // T: Cyan
+  { color: "#32ADE6", d: "M 150 90 L 230 90 M 190 90 L 190 150" },
   // U: Green
-  { color: "#33FF66", d: "M 240 90 L 240 130 C 240 160, 300 160, 300 130 L 300 90" },
+  { color: "#34C759", d: "M 240 90 L 240 130 C 240 160, 300 160, 300 130 L 300 90" },
   // S: Blue
-  { color: "#3366FF", d: "M 350 90 C 310 90, 310 120, 330 120 C 350 120, 350 150, 310 150" }
+  { color: "#007AFF", d: "M 350 90 C 310 90, 310 120, 330 120 C 350 120, 350 150, 310 150" }
 ];
 
 export function SplashScreen({ onComplete }: { onComplete: () => void }) {
@@ -22,60 +22,103 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsFinished(true);
-      setTimeout(onComplete, 1200);
+      setTimeout(onComplete, 1500);
     }, 5500);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
     <div className="fixed inset-0 z-[1000] bg-[#020202] flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Ambient Glow */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#FF3366]/5 via-black to-[#00CCFF]/5 pointer-events-none" />
+      {/* Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] to-black" />
+      
+      {/* Dynamic Lighting Background */}
+      <motion.div 
+        animate={{ opacity: [0.1, 0.15, 0.1] }}
+        transition={{ duration: 4, repeat: Infinity }}
+        className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]"
+      />
 
-      {/* MOTUS 3-Line Neon Road Logo */}
+      {/* MOTUS Hyper-Realistic Neon Sign */}
       <div className="relative w-full max-w-4xl px-4 sm:px-12 flex items-center justify-center -mt-10">
         <svg 
           viewBox="-10 20 400 160" 
-          className="w-full h-auto overflow-visible"
+          className="w-full h-auto overflow-visible select-none"
         >
+          <defs>
+            <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
           {PATHS.map((path, i) => {
-            const transition = { duration: 1.5, delay: i * 0.8, ease: "easeInOut" };
+            const transition = { 
+              duration: 1.8, 
+              delay: i * 0.8, 
+              ease: [0.25, 0.1, 0.25, 1] 
+            };
             
             return (
               <g key={i}>
-                {/* 1. Neon Aura Bloom */}
+                {/* Layer 1: Expansive Bloom */}
                 <motion.path
                   d={path.d}
                   fill="none"
                   stroke={path.color}
-                  strokeWidth="24"
+                  strokeWidth="28"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.2 }}
+                  animate={{ pathLength: 1, opacity: 0.12 }}
                   transition={transition}
-                  style={{ filter: 'blur(12px)' }}
+                  style={{ filter: 'blur(24px)' }}
                 />
                 
-                {/* 2. Outer Line (Line 1) */}
+                {/* Layer 2: Tight Core Glow */}
                 <motion.path
                   d={path.d}
                   fill="none"
                   stroke={path.color}
-                  strokeWidth="18"
+                  strokeWidth="16"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 0.6 }}
                   transition={transition}
+                  style={{ filter: 'blur(6px)' }}
                 />
 
-                {/* 3. Gap 1 (Black) */}
+                {/* Layer 3: Physical Tube Boundary */}
+                <motion.path
+                  d={path.d}
+                  fill="none"
+                  stroke={path.color}
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ 
+                    pathLength: 1, 
+                    opacity: 1,
+                    strokeWidth: isFinished ? [12, 12.5, 12] : 12,
+                  }}
+                  transition={{
+                    ...transition,
+                    strokeWidth: { duration: 0.1, repeat: Infinity, repeatType: "reverse" }
+                  }}
+                  style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}
+                />
+
+                {/* Layer 4: Road Mask (Creates the 2 paths) */}
                 <motion.path
                   d={path.d}
                   fill="none"
                   stroke="#020202"
-                  strokeWidth="14"
+                  strokeWidth="8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   initial={{ pathLength: 0 }}
@@ -83,43 +126,23 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
                   transition={transition}
                 />
 
-                {/* 4. Intermediate Line (Line 2 - REQUESTED) */}
+                {/* Layer 5: Intermediate Divider Line (THE ONE INTERNAL LINE) */}
                 <motion.path
                   d={path.d}
                   fill="none"
                   stroke={path.color}
-                  strokeWidth="10"
-                  strokeLinecap="round"
+                  strokeWidth="1.5"
+                  strokeLinecap="butt" // Prevents starting dots
                   strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={transition}
-                />
-
-                {/* 5. Gap 2 (Black) */}
-                <motion.path
-                  d={path.d}
-                  fill="none"
-                  stroke="#020202"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={transition}
-                />
-
-                {/* 6. Inner Line (Line 3) */}
-                <motion.path
-                  d={path.d}
-                  fill="none"
-                  stroke={path.color}
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={transition}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ 
+                    pathLength: 1, 
+                    opacity: [0, 0, 1], // Flicks on at end of drawing
+                  }}
+                  transition={{
+                    ...transition,
+                    opacity: { times: [0, 0.8, 1], duration: 1.8 + i * 0.8 }
+                  }}
                 />
               </g>
             );
@@ -129,32 +152,41 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         <AnimatePresence>
           {isFinished && (
             <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-white/5 blur-[80px] rounded-full pointer-events-none"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute inset-0 bg-white/[0.02] blur-[120px] rounded-full pointer-events-none"
             />
           )}
         </AnimatePresence>
       </div>
 
-      {/* Progress Bar Sync */}
+      {/* Progress Info */}
       <motion.div 
-        className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        className="absolute bottom-20 flex flex-col items-center gap-6"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] italic">
-          {isFinished ? 'NODO INICIADO' : 'CARGANDO SISTEMA MOTUS...'}
-        </span>
-        <div className="h-1 w-[200px] sm:w-[300px] bg-white/10 rounded-full overflow-hidden relative">
+        <div className="flex flex-col items-center gap-2">
+           <motion.span 
+             animate={{ opacity: [0.3, 0.6, 0.3] }}
+             transition={{ duration: 2, repeat: Infinity }}
+             className="text-[9px] font-black text-white uppercase tracking-[0.8em] ml-[0.8em]"
+           >
+             {isFinished ? 'STATUS: ONLINE' : 'AUTODIAGNÓSTICO INICIAL'}
+           </motion.span>
+        </div>
+        
+        <div className="h-0.5 w-[240px] bg-white/5 rounded-full overflow-hidden relative border border-white/5">
           <motion.div 
-            className="h-full rounded-full absolute left-0 top-0 shadow-[0_0_20px_#22d3ee]"
-            style={{ backgroundColor: '#22d3ee' }}
+            className="h-full absolute left-0 top-0"
+            style={{ 
+              backgroundColor: '#32ADE6',
+              boxShadow: '0 0 15px #32ADE6'
+            }}
             initial={{ width: '0%' }}
             animate={{ width: '100%' }}
-            transition={{ duration: 5.5, ease: "linear" }}
+            transition={{ duration: 5.5, ease: "easeInOut" }}
           />
         </div>
       </motion.div>
