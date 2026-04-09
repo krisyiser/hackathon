@@ -113,11 +113,15 @@ export function ReportScreen() {
     }, 350);
   };
 
-  const handlePointerUp = async () => {
+  const handlePointerUp = async (e: React.PointerEvent) => {
+    e.preventDefault();
     if (pressTimer.current) clearTimeout(pressTimer.current);
+    
+    // Si estábamos presionando y hay una categoría seleccionada, la enviamos
     if (isPressing && selectedCategory) {
       await submitReport(selectedCategory);
     }
+    
     setIsPressing(false);
     setSelectedCategory(null);
   };
@@ -142,6 +146,10 @@ export function ReportScreen() {
     // 2. Mostrar éxito inmediato en el UI (Optimistic UI)
     setShowSuccess(true);
     if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
+
+    // Force clear states to avoid UI hanging
+    setIsPressing(false);
+    setSelectedCategory(null);
 
     try {
       const formData = new FormData();
@@ -171,6 +179,8 @@ export function ReportScreen() {
     <div 
       className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative"
       onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
       ref={containerRef}
     >
       
@@ -277,9 +287,8 @@ export function ReportScreen() {
 
         <button
           onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
           className={cn(
-            "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-700 flex items-center justify-center overflow-hidden active:scale-95 group select-none touch-none",
+            "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-500 flex items-center justify-center overflow-hidden active:scale-95 group select-none touch-none",
             isPressing ? "bg-white/20 scale-[0.85] shadow-[0_0_100px_rgba(255,255,255,0.2)]" : "glass-premium hover:bg-white/10",
             isListening && "border-rose-500 shadow-[0_0_60px_rgba(242,19,20,0.4)]"
           )}
