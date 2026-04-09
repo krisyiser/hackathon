@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export function SplashScreen({ onComplete }: { onComplete: () => void }) {
   const [isFinished, setIsFinished] = useState(false);
