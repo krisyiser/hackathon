@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, ChevronRight, Activity, Terminal, UserPlus, Fingerprint, ShieldCheck, KeyRound, UserCircle } from 'lucide-react';
+import { Mail, Lock, ChevronRight, Activity, UserPlus, Fingerprint, ShieldCheck, KeyRound, UserCircle } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -46,7 +46,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
           setStatus('idle');
           if (navigator.vibrate) navigator.vibrate([100, 100]);
         }
-      } catch (err) {
+      } catch {
         setError("ERROR DE CONEXIÓN");
         setStatus('idle');
       }
