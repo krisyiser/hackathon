@@ -229,13 +229,6 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
         </AnimatePresence>
       </motion.div>
 
-      {/* COMPACT FOOTER */}
-      <div className="absolute bottom-6 flex flex-col items-center gap-1 opacity-20 scale-75">
-        <div className="flex items-center gap-2">
-          <Terminal className="w-3 h-3 text-rose-500" />
-          <span className="text-[10px] font-bold tracking-widest text-white uppercase italic">DECRYPT_AUTH_v3.2</span>
-        </div>
-      </div>
 
       <style jsx global>{`
         @keyframes scan { 0% { transform: translateY(-10px); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(110px); opacity: 0; } }

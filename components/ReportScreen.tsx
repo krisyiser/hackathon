@@ -188,7 +188,6 @@ export function ReportScreen() {
         <div className="flex-1 min-w-0 pr-4">
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 mb-2 sm:mb-4">
              <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
-             <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-[0.2em] truncate">Terminal de Comunicaciones v2.0</span>
           </motion.div>
           <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br/><span className="text-white/20">de Alerta.</span></h3>
         </div>

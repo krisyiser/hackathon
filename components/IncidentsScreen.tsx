@@ -122,8 +122,8 @@ export function IncidentsScreen() {
                           </div>
                           <span className="text-[9px] font-black text-white/20 tracking-widest uppercase">NIVEL {report.intensidad}</span>
                        </div>
-                       <div className="text-[10px] font-black text-white/40 font-mono tracking-tighter bg-white/5 px-3 py-1 rounded-lg italic">
-                          SNAPSHOT: {new Date(report.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                       <div className="text-[10px] font-bold text-white/40 font-mono tracking-tighter bg-white/5 px-3 py-1 rounded-lg italic">
+                          {new Date(report.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
                        </div>
                     </div>
                   </div>
@@ -163,7 +163,7 @@ export function IncidentsScreen() {
                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-50" />
                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-50" />
                   </div>
-                  <span className="text-[10px] font-black font-mono text-white/40 tracking-[0.3em] uppercase">EXPEDIENTE-{selectedIncident.id.toString().slice(-6).toUpperCase()}</span>
+                  <span className="text-[10px] font-bold font-mono text-white/20 tracking-[0.3em] uppercase">{selectedIncident.id.toString().slice(-6).toUpperCase()}</span>
                   <button onClick={() => setSelectedIncident(null)} className="text-white/40 hover:text-white transition-colors bg-white/5 p-2 rounded-xl border border-white/10">
                      <X className="w-6 h-6" />
                   </button>
