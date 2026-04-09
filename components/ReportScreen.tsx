@@ -198,7 +198,7 @@ export function ReportScreen() {
           onClick={() => setIsFormOpen(true)}
           initial={false}
           animate={{ 
-            width: isExpanded ? (isMobile ? '160px' : '220px') : '64px',
+            width: isExpanded ? (isMobile ? '190px' : '240px') : '64px',
             backgroundColor: isExpanded ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 30, 30, 0.1)'
           }}
           className="h-16 sm:h-20 rounded-2xl glass-premium flex items-center px-4 border-white/10 shadow-2xl shrink-0 active:scale-95 transition-all overflow-hidden relative group"
@@ -230,7 +230,7 @@ export function ReportScreen() {
         <div className="absolute inset-0 pointer-events-none z-0">
           <AnimatePresence>
             {ripples.map(r => (
-              <motion.div key={r.id} initial={{ scale: 0, opacity: 0.5 }} animate={{ scale: 20, opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="absolute rounded-full border-[2px] border-rose-500/30" style={{ width: 100, height: 100, left: r.x - 50, top: r.y - 50 }} onAnimationComplete={() => setRipples(prev => prev.filter(p => p.id !== r.id))} />
+              <motion.div key={r.id} initial={{ scale: 0, opacity: 1 }} animate={{ scale: 25, opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="absolute rounded-full border-[4px] border-rose-500 bg-rose-500/20 shadow-[0_0_30px_rgba(244,63,94,0.5)]" style={{ width: 100, height: 100, left: r.x - 50, top: r.y - 50 }} onAnimationComplete={() => setRipples(prev => prev.filter(p => p.id !== r.id))} />
             ))}
           </AnimatePresence>
         </div>
@@ -308,7 +308,7 @@ export function ReportScreen() {
             <div className="sticky top-0 z-50 bg-black/60 backdrop-blur-3xl px-6 py-8 flex items-center justify-between border-b border-white/5">
               <div className="flex flex-col">
                  <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-[0.3em] mb-1">Motus Intelligence System</span>
-                 <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Generar Alerta</h4>
+                 <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Reporte detallado</h4>
               </div>
               <button onClick={() => setIsFormOpen(false)} className="w-14 h-14 rounded-2xl glass-premium flex items-center justify-center border-white/10 active:scale-90 transition-transform"><X className="text-white w-6 h-6" /></button>
             </div>
@@ -321,21 +321,21 @@ export function ReportScreen() {
                   <div className="w-8 h-[1px] bg-rose-500" />
                   <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Tipo de Incidente</label>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
                   {categories.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setFormData(prev => ({ ...prev, tipo: cat.id }))}
                       className={cn(
-                        "relative h-24 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all duration-500 overflow-hidden",
-                        formData.tipo === cat.id ? "glass-premium border-white/30 scale-105" : "bg-white/5 border-transparent opacity-30 grayscale"
+                        "shrink-0 w-24 h-24 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all duration-500 overflow-hidden relative",
+                        formData.tipo === cat.id ? "glass-premium border-white/30 scale-105" : "bg-white/5 border border-transparent opacity-50 grayscale"
                       )}
                     >
                       {formData.tipo === cat.id && (
-                        <motion.div layoutId="glow" className="absolute inset-0 blur-2xl opacity-20" style={{ backgroundColor: cat.color }} />
+                        <motion.div layoutId="glow" className="absolute inset-0 blur-2xl opacity-40" style={{ backgroundColor: cat.color }} />
                       )}
-                      <cat.icon className="w-7 h-7 relative z-10" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} />
-                      <span className="text-[8px] font-black tracking-widest uppercase relative z-10">{cat.id}</span>
+                      <cat.icon className="w-8 h-8 relative z-10" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} />
+                      <span className="text-[9px] font-black tracking-widest uppercase text-white relative z-10">{cat.id}</span>
                     </button>
                   ))}
                 </div>
@@ -348,13 +348,13 @@ export function ReportScreen() {
                     "absolute left-6 transition-all font-black text-[9px] uppercase tracking-[0.3em]",
                     formData.titulo ? "-top-3 text-rose-500" : "top-5 text-white/20"
                   )}>Título del Suceso</label>
-                  <div className="rounded-[32px] glass-premium p-[1px] bg-gradient-to-r from-white/10 to-transparent focus-within:from-rose-500/40 transition-all">
+                  <div className="rounded-[32px] glass-premium p-1 border-2 border-white/10 focus-within:border-rose-500 bg-white/5 transition-all">
                     <input 
                       type="text" 
                       value={formData.titulo}
                       onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
                       placeholder={formData.titulo ? "" : "Identifique el incidente..."} 
-                      className="w-full bg-black/40 rounded-[31px] px-6 py-5 text-lg text-white placeholder:text-white/10 outline-none font-bold italic"
+                      className="w-full bg-black/40 rounded-[28px] px-6 py-5 text-lg text-white placeholder:text-white/30 outline-none font-bold italic"
                     />
                   </div>
                 </div>
@@ -364,13 +364,13 @@ export function ReportScreen() {
                     "absolute left-6 transition-all font-black text-[9px] uppercase tracking-[0.3em]",
                     formData.descripcion ? "-top-3 text-rose-500" : "top-5 text-white/20"
                   )}>Bitácora de Detalles</label>
-                  <div className="rounded-[32px] glass-premium p-[1px] bg-gradient-to-r from-white/10 to-transparent focus-within:from-rose-500/40 transition-all">
+                  <div className="rounded-[32px] glass-premium p-1 border-2 border-white/10 focus-within:border-rose-500 bg-white/5 transition-all">
                     <textarea 
                       value={formData.descripcion}
                       onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
                       placeholder={formData.descripcion ? "" : "Relate los hechos observados..."} 
                       rows={5}
-                      className="w-full bg-black/40 rounded-[31px] px-6 py-5 text-white placeholder:text-white/10 outline-none font-medium resize-none leading-relaxed"
+                      className="w-full bg-black/40 rounded-[28px] px-6 py-5 text-white placeholder:text-white/30 outline-none font-medium resize-none leading-relaxed"
                     />
                   </div>
                 </div>
@@ -417,19 +417,18 @@ export function ReportScreen() {
               </div>
             </div>
 
-            {/* ACTION BAR */}
-            <div className="fixed bottom-[120px] left-6 right-6 z-[60]">
-               <button 
-                onClick={() => submitReport(formData)}
-                className="w-full h-20 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(225,29,72,0.4)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
-              >
-                <div className="flex items-center gap-4">
-                  <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
-                  Transmitir Alerta
-                </div>
-                <ChevronRight className="w-6 h-6 opacity-40" />
-              </button>
-            </div>
+              <div className="w-full pb-8 pt-4">
+                 <button 
+                  onClick={() => submitReport(formData)}
+                  className="w-full h-20 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(225,29,72,0.4)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
+                >
+                  <div className="flex items-center gap-4">
+                    <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
+                    ENVIAR
+                  </div>
+                  <ChevronRight className="w-6 h-6 opacity-40" />
+                </button>
+              </div>
           </motion.div>
         )}
       </AnimatePresence>

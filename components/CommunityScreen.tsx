@@ -112,7 +112,7 @@ export function CommunityScreen() {
     <div className="flex-1 overflow-y-auto bg-black pt-32 sm:pt-40 pb-48 no-scrollbar relative font-sans">
       
       {/* Header (Responsive Minimal) */}
-      <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/5 px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between">
+      <div className="relative z-20 bg-transparent px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between">
         <h2 className="text-xl sm:text-2xl font-black text-white italic tracking-tighter uppercase">Pulso Urbano</h2>
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full glass-premium flex items-center justify-center text-blue-400">
            <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />

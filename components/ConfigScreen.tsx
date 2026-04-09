@@ -143,7 +143,14 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
                <div className="absolute -inset-8 bg-gradient-to-tr from-cyan-500/30 to-rose-500/30 rounded-full blur-3xl animate-pulse" />
                <div className="relative w-48 h-48 rounded-[64px] glass-premium p-4 border-white/20">
                   <div className="w-full h-full rounded-[50px] bg-gradient-to-tr from-slate-900 to-black flex items-center justify-center relative overflow-hidden">
-                     <User className="w-24 h-24 text-white opacity-20" />
+                     <motion.img 
+                       initial={{ y: 0 }}
+                       animate={{ y: [-5, 5, -5] }}
+                       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                       src="https://api.dicebear.com/7.x/micah/svg?seed=MotusElite&backgroundColor=transparent" 
+                       alt="3D Avatar" 
+                       className="w-[120%] h-[120%] object-cover object-top scale-110" 
+                     />
                      <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 to-transparent" />
                   </div>
                   
@@ -154,13 +161,12 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
                </div>
             </div>
             
-            <div className="text-center">
+            <div className="text-center mb-4">
               <h2 className="text-4xl font-black text-white tracking-tight leading-tight">{profile.nombre}</h2>
-              <span className="text-[12px] font-black text-white/40 uppercase tracking-[0.5em] mt-6 block italic">Operador Élite</span>
             </div>
 
             {/* Amber Pulsing Rotation Icon ONLY */}
-            <div className="absolute bottom-10 text-amber-500 animate-pulse">
+            <div className="absolute bottom-6 text-amber-500 animate-pulse">
                <RotateCw className="w-8 h-8" strokeWidth={3} />
             </div>
           </div>
@@ -218,8 +224,13 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
                 ))}
               </div>
               
+              <div className="pt-2 text-center">
+                 <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] flex items-center justify-center gap-1.5 opacity-80">
+                    <CheckCircle2 className="w-3 h-3" /> Todos los datos están encriptados
+                 </span>
+              </div>
               {/* Amber Pulsing Rotation Icon ONLY (Back) */}
-              <div className="pt-4 flex items-center justify-center text-amber-500 animate-pulse">
+              <div className="pt-2 flex items-center justify-center text-amber-500 animate-pulse">
                  <RotateCw className="w-8 h-8" strokeWidth={3} />
               </div>
             </div>

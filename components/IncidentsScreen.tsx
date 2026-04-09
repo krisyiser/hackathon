@@ -212,19 +212,11 @@ export function IncidentsScreen() {
                         <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] italic" style={{ color: categoryConfigs[selectedIncident.type].hex }}>RANGO NIVEL {selectedIncident.intensidad}</span>
                      </div>
                   </div>
-                  <div className="flex flex-col gap-4 pt-4 pb-12">
-                     <button className="group w-full py-8 sm:py-12 bg-white text-black rounded-[32px] sm:rounded-[48px] font-black uppercase tracking-[0.4em] text-xs sm:text-sm active:scale-95 transition-all flex items-center justify-center gap-4 shadow-[0_20px_40px_rgba(255,255,255,0.1)] hover:bg-cyan-400 transition-colors">
-                        <Navigation className="w-6 h-6 group-hover:rotate-45 transition-transform" strokeWidth={3} />
-                        TRAZAR RUTA TÁCTICA
+                  <div className="flex flex-col gap-4 pt-4 pb-32">
+                     <button className="group w-full py-6 sm:py-8 bg-cyan-400 hover:bg-cyan-300 text-black rounded-[32px] font-black uppercase tracking-[0.3em] text-[11px] sm:text-xs active:scale-95 transition-all flex items-center justify-center gap-3 shadow-[0_15px_40px_rgba(34,211,238,0.3)]">
+                        <Share2 className="w-5 h-5" strokeWidth={3} />
+                        Compartir en Redes
                      </button>
-                     <div className="grid grid-cols-2 gap-4">
-                        <button className="py-6 bg-white/5 rounded-[24px] border border-white/10 text-white/50 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-white/10 transition-colors">
-                           <Share2 className="w-5 h-5" /> EXPORTAR
-                        </button>
-                        <button className="py-6 bg-emerald-500/10 rounded-[24px] border border-emerald-500/20 text-emerald-400 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 cursor-default">
-                           <Activity className="w-5 h-5 animate-pulse" /> ACTIVO
-                        </button>
-                     </div>
                   </div>
                </div>
             </motion.div>
