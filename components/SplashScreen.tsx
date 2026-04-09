@@ -4,23 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PATHS = [
-  // M: Vivid Pink
-  { color: "#FF0066", d: "M 10 140 L 25 60 L 45 120 L 65 60 L 80 140 Q 85 140 95 125" },
-  // O: Vivid Orange
-  { color: "#FF6600", d: "M 95 125 A 25 25 0 1 1 105 125 Q 120 150 160 140" },
-  // T: Cyber Cyan
-  { color: "#00E5FF", d: "M 160 140 Q 190 140 190 110 L 190 60 L 160 60 L 220 60 L 190 60 L 190 130 Q 190 140 220 140" },
-  // U: Emerald Teal
-  { color: "#00FF66", d: "M 220 140 Q 230 140 240 60 L 240 120 A 20 20 0 0 0 280 120 L 280 60 C 280 15 350 15 350 60" },
-  // S: Electric Purple
-  { color: "#A800FF", d: "M 350 60 L 320 60 A 20 20 0 0 0 320 100 L 330 100 A 20 20 0 0 1 330 140 L 290 140" }
+  // M: Pink/Rose
+  { color: "#FF3366", d: "M 20 140 L 40 40 L 60 110 L 80 40 L 100 140" },
+  // O: Yellow/Gold - Passes under to T
+  { color: "#FFCC00", d: "M 100 140 C 100 80, 160 80, 160 120 C 160 160, 100 160, 100 120 C 100 100, 150 90, 180 90" },
+  // T: Cyan - Header passes top
+  { color: "#00CCFF", d: "M 150 90 L 230 90 M 190 90 L 190 150" },
+  // U: Green
+  { color: "#33FF66", d: "M 240 90 L 240 130 C 240 160, 300 160, 300 130 L 300 90" },
+  // S: Blue
+  { color: "#3366FF", d: "M 350 90 C 310 90, 310 120, 330 120 C 350 120, 350 150, 310 150" }
 ];
 
 export function SplashScreen({ onComplete }: { onComplete: () => void }) {
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
-    // Sequence total matches 5s progress bar
     const timer = setTimeout(() => {
       setIsFinished(true);
       setTimeout(onComplete, 1200);
@@ -30,57 +29,52 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div className="fixed inset-0 z-[1000] bg-[#020202] flex flex-col items-center justify-center overflow-hidden">
-      {/* Deep Space Ambient Glow */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#FF0066]/5 via-black to-[#00E5FF]/5 pointer-events-none" />
+      {/* Background Ambient Glow */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#FF3366]/5 via-black to-[#00CCFF]/5 pointer-events-none" />
 
-      {/* MOTUS 2-Lane Neon Sign */}
+      {/* MOTUS 3-Line Neon Road Logo */}
       <div className="relative w-full max-w-4xl px-4 sm:px-12 flex items-center justify-center -mt-10">
         <svg 
-          viewBox="-10 10 390 180" 
-          className="w-full h-auto overflow-visible" 
-          style={{ 
-            filter: isFinished ? 'drop-shadow(0 0 25px rgba(255,255,255,0.3))' : 'drop-shadow(0 0 15px rgba(0,0,0,0.5))', 
-            transition: 'filter 1s ease' 
-          }}
+          viewBox="-10 20 400 160" 
+          className="w-full h-auto overflow-visible"
         >
           {PATHS.map((path, i) => {
-            const transition = { duration: 1.5, delay: i * 0.8, ease: [0.22, 1, 0.36, 1] };
+            const transition = { duration: 1.5, delay: i * 0.8, ease: "easeInOut" };
             
             return (
               <g key={i}>
-                {/* Massive Neon Aura */}
+                {/* 1. Neon Aura Bloom */}
                 <motion.path
                   d={path.d}
                   fill="none"
                   stroke={path.color}
-                  strokeWidth="32"
+                  strokeWidth="24"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.15 }}
+                  animate={{ pathLength: 1, opacity: 0.2 }}
                   transition={transition}
-                  style={{ filter: 'blur(20px)' }}
+                  style={{ filter: 'blur(12px)' }}
                 />
                 
-                {/* Secondary Tight Glow */}
+                {/* 2. Outer Line (Line 1) */}
                 <motion.path
                   d={path.d}
                   fill="none"
                   stroke={path.color}
-                  strokeWidth="20"
+                  strokeWidth="18"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.5 }}
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
                   transition={transition}
-                  style={{ filter: 'blur(8px)' }}
                 />
-                
-                {/* Physical Outer Tube */}
+
+                {/* 3. Gap 1 (Black) */}
                 <motion.path
                   d={path.d}
                   fill="none"
-                  stroke={path.color}
+                  stroke="#020202"
                   strokeWidth="14"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -89,12 +83,38 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
                   transition={transition}
                 />
 
-                {/* Inner Cutout (Forms the two tracks natively!) */}
+                {/* 4. Intermediate Line (Line 2 - REQUESTED) */}
+                <motion.path
+                  d={path.d}
+                  fill="none"
+                  stroke={path.color}
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={transition}
+                />
+
+                {/* 5. Gap 2 (Black) */}
                 <motion.path
                   d={path.d}
                   fill="none"
                   stroke="#020202"
-                  strokeWidth="8"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={transition}
+                />
+
+                {/* 6. Inner Line (Line 3) */}
+                <motion.path
+                  d={path.d}
+                  fill="none"
+                  stroke={path.color}
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   initial={{ pathLength: 0 }}
@@ -118,7 +138,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         </AnimatePresence>
       </div>
 
-      {/* Progress Sync Bar */}
+      {/* Progress Bar Sync */}
       <motion.div 
         className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
         initial={{ opacity: 0 }}
@@ -126,12 +146,12 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         transition={{ delay: 0.5 }}
       >
         <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] italic">
-          {isFinished ? 'SISTEMA INICIADO' : 'CARGANDO MÓDULOS...'}
+          {isFinished ? 'NODO INICIADO' : 'CARGANDO SISTEMA MOTUS...'}
         </span>
         <div className="h-1 w-[200px] sm:w-[300px] bg-white/10 rounded-full overflow-hidden relative">
           <motion.div 
-            className="h-full rounded-full absolute left-0 top-0 shadow-[0_0_20px_#00E5FF]"
-            style={{ backgroundColor: '#00E5FF' }}
+            className="h-full rounded-full absolute left-0 top-0 shadow-[0_0_20px_#22d3ee]"
+            style={{ backgroundColor: '#22d3ee' }}
             initial={{ width: '0%' }}
             animate={{ width: '100%' }}
             transition={{ duration: 5.5, ease: "linear" }}
