@@ -135,6 +135,8 @@ export function ReportScreen() {
       fd.append("latitud", reportData.latitud.toString());
       fd.append("longitud", reportData.longitud.toString());
       fd.append("tipo", reportData.tipo);
+      fd.append("titulo", "");
+      fd.append("descripcion", "");
       
       const response = await fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
         method: "POST", 
