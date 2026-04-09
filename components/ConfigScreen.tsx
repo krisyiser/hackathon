@@ -144,12 +144,12 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
                <div className="relative w-48 h-48 rounded-[64px] glass-premium p-4 border-white/20">
                   <div className="w-full h-full rounded-[50px] bg-gradient-to-tr from-slate-900 to-black flex items-center justify-center relative overflow-hidden">
                      <motion.img 
-                       initial={{ y: 0 }}
-                       animate={{ y: [-8, 8, -8] }}
-                       transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                       src="https://em-content.zobj.net/source/apple/391/technologist_1f9d1-200d-1f4bb.png" 
-                       alt="3D Avatar" 
-                       className="w-[90%] h-[90%] object-contain" 
+                       initial={{ y: 0, scale: 1.1 }}
+                       animate={{ y: [-10, 10, -10] }}
+                       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                       src="/avatar_elite.png" 
+                       alt="Elite Operator 3D" 
+                       className="w-full h-full object-cover object-top" 
                      />
                      <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 to-transparent" />
                   </div>
