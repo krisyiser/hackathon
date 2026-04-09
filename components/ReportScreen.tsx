@@ -120,8 +120,8 @@ export function ReportScreen() {
   const submitReport = async (type: IncidentType) => {
     const win = window as unknown as { lat_global?: number; lng_global?: number; };
     const reportData = {
-      lat: win.lat_global || 19.4326,
-      lng: win.lng_global || -99.1332,
+      latitud: win.lat_global || 19.4326,
+      longitud: win.lng_global || -99.1332,
       tipo: type
     };
 
@@ -132,7 +132,9 @@ export function ReportScreen() {
 
     try {
       const fd = new FormData();
-      Object.entries(reportData).forEach(([k,v]) => fd.append(k, v.toString()));
+      fd.append("latitud", reportData.latitud.toString());
+      fd.append("longitud", reportData.longitud.toString());
+      fd.append("tipo", reportData.tipo);
       
       const response = await fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
         method: "POST", 
