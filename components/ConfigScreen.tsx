@@ -162,7 +162,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
             </div>
             
             <div className="text-center mb-4">
-              <h2 className="text-4xl font-black text-white tracking-tight leading-tight">{profile.nombre}</h2>
+              <h2 className="text-4xl font-bold text-white tracking-tight leading-tight">{profile.nombre}</h2>
             </div>
 
             {/* Amber Pulsing Rotation Icon ONLY */}
@@ -179,7 +179,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
             <div className="h-full flex flex-col">
               <div className="flex items-center justify-between mb-8">
                 <div className="w-12" /> {/* Spacer */}
-                <h3 className="text-[11px] font-black text-white uppercase tracking-[0.3em] opacity-40">Expediente</h3>
+                <h3 className="text-[11px] font-bold text-white uppercase tracking-[0.3em] opacity-40">Expediente</h3>
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
@@ -213,7 +213,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
                        <input 
                          type="text"
                          defaultValue={field.value}
-                         className="bg-transparent border-none p-0 text-sm font-bold text-white focus:ring-0 w-full outline-none"
+                         className="bg-transparent border-none p-0 text-sm font-bold text-white focus:ring-0 w-full outline-none italic"
                          autoFocus={i === 0}
                          onClick={(e) => e.stopPropagation()}
                        />
@@ -243,7 +243,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
         
         {/* PERSONALIZATION */}
         <div>
-          <h3 className="text-[12px] font-black text-white/40 uppercase tracking-[0.4em] mb-8 ml-6">Personalización Operativa</h3>
+          <h3 className="text-[12px] font-bold text-white/40 uppercase tracking-[0.4em] mb-8 ml-6">Personalización Operativa</h3>
           <div className="space-y-4">
             
             {/* Notification Vibration */}
@@ -351,7 +351,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
         
         {/* Logout */}
         <div className="pt-20 pb-10">
-           <button className="w-full py-12 glass-card-premium rounded-[54px] flex items-center justify-center gap-6 text-white font-black text-base uppercase tracking-[0.6em] border-white/10 hover:bg-white/5 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl">
+           <button className="w-full py-12 glass-card-premium rounded-[54px] flex items-center justify-center gap-6 text-white font-bold text-base uppercase tracking-[0.6em] border-white/10 hover:bg-white/5 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl">
               <LogOut className="w-8 h-8" strokeWidth={3} />
               Cerrar Protocolo
            </button>

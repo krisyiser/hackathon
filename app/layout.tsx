@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const montserrat = Montserrat({ subsets: ["latin"], weight: ["100", "300", "400", "600", "700", "900"], variable: "--font-montserrat" });
 
 export const metadata: Metadata = {
   title: "MOTUS CITY | Resilient Mobility CDMX",
@@ -35,17 +34,9 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={`${inter.variable} ${outfit.variable} font-sans bg-slate-950 text-white selection:bg-blue-500/30 overflow-hidden`}>
+      <body className={`${montserrat.variable} font-sans bg-black text-white selection:bg-cyan-500/30 overflow-hidden`}>
         {children}
       </body>
     </html>
   );
 }
-
-// Force Deploy: Wed Apr  8 21:00:01 CST 2026
-
-// Update Sync: Wed Apr  8 22:07:32 CST 2026
-
-// Final Payload Sync: Wed Apr  8 22:59:27 CST 2026
-
-// Final Deploy Sync: Wed Apr  8 23:14:43 CST 2026

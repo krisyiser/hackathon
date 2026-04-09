@@ -81,8 +81,8 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl font-black text-white italic tracking-tighter uppercase leading-none mb-1 select-none">MOTUS</h1>
-        <p className="text-[10px] font-black text-cyan-400/60 uppercase tracking-[0.4em] italic mb-8 sm:mb-10">Intelligence Node</p>
+        <h1 className="text-4xl sm:text-5xl font-bold text-white italic tracking-tighter uppercase leading-none mb-1 select-none">MOTUS</h1>
+        <p className="text-[10px] font-bold text-cyan-400/60 uppercase tracking-[0.4em] italic mb-8 sm:mb-10">Intelligence Node</p>
 
         <AnimatePresence mode="wait">
           <motion.form 
@@ -233,7 +233,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
       <div className="absolute bottom-6 flex flex-col items-center gap-1 opacity-20 scale-75">
         <div className="flex items-center gap-2">
           <Terminal className="w-3 h-3 text-rose-500" />
-          <span className="text-[8px] font-mono tracking-widest text-white">DECRYPT_AUTH_v3.2</span>
+          <span className="text-[10px] font-bold tracking-widest text-white uppercase italic">DECRYPT_AUTH_v3.2</span>
         </div>
       </div>
 

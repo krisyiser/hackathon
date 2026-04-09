@@ -22,9 +22,19 @@ html, body {
   margin: 0;
   padding: 0;
   background: var(--app-bg);
-  color: white;
-  font-family: 'Montserrat', sans-serif;
+  color: #FFFFFF;
+  font-family: var(--font-montserrat), 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .font-bold-standard {
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+}
+
+input, textarea, select, .input-standard {
+  font-style: italic !important;
+  color: #FFFFFF !important;
 }
 
 /* Apple Premium Glassmorphism */

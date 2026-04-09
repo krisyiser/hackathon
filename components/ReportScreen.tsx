@@ -319,7 +319,7 @@ export function ReportScreen() {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-[1px] bg-emerald-400" />
-                  <label className="text-[10px] font-black text-white/90 uppercase tracking-[0.3em]">Tipo de Incidente</label>
+                  <label className="text-[10px] font-bold text-white uppercase tracking-[0.3em]">Tipo de Incidente</label>
                 </div>
                 <div className="flex justify-between items-start w-full gap-2">
                   {categories.map((cat) => (
@@ -335,7 +335,7 @@ export function ReportScreen() {
                         <motion.div layoutId="glow" className="absolute inset-0 blur-xl opacity-60" style={{ backgroundColor: cat.color }} />
                       )}
                       <cat.icon className="w-5 h-5 sm:w-7 sm:h-7 relative z-10" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} strokeWidth={3} />
-                      <span className="text-[7px] sm:text-[9px] font-black tracking-widest uppercase text-white relative z-10 truncate w-full px-1 text-center">{cat.id}</span>
+                      <span className="text-[7px] sm:text-[9px] font-bold tracking-widest uppercase text-white relative z-10 truncate w-full px-1 text-center">{cat.id}</span>
                     </button>
                   ))}
                 </div>
@@ -345,7 +345,7 @@ export function ReportScreen() {
               <div className="space-y-10">
                 <div className="relative group">
                   <label className={cn(
-                    "absolute left-6 transition-all font-black text-[10px] uppercase tracking-[0.3em] z-10 px-2 bg-black/60 rounded-full",
+                    "absolute left-6 transition-all font-bold text-[10px] uppercase tracking-[0.3em] z-10 px-2 bg-black/60 rounded-full",
                     formData.titulo ? "-top-3 text-cyan-400" : "top-5 text-white/80"
                   )}>Título del Suceso</label>
                   <div className="rounded-[32px] glass-premium p-1 border-2 border-white/30 focus-within:border-cyan-400 bg-white/10 transition-all relative">
@@ -361,7 +361,7 @@ export function ReportScreen() {
 
                 <div className="relative group">
                   <label className={cn(
-                    "absolute left-6 transition-all font-black text-[10px] uppercase tracking-[0.3em] z-10 px-2 bg-black/60 rounded-full",
+                    "absolute left-6 transition-all font-bold text-[10px] uppercase tracking-[0.3em] z-10 px-2 bg-black/60 rounded-full",
                     formData.descripcion ? "-top-3 text-cyan-400" : "top-5 text-white/80"
                   )}>Bitácora de Detalles</label>
                   <div className="rounded-[32px] glass-premium p-1 border-2 border-white/30 focus-within:border-cyan-400 bg-white/10 transition-all relative">
@@ -380,7 +380,7 @@ export function ReportScreen() {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-[1px] bg-emerald-400" />
-                  <label className="text-[10px] font-black text-white/90 uppercase tracking-[0.3em]">Captura de Evidencia</label>
+                  <label className="text-[10px] font-bold text-white uppercase tracking-[0.3em]">Captura de Evidencia</label>
                 </div>
                 <div className="relative aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-white/5 group transition-all active:scale-[0.98]">
                   <input type="file" accept="image/*" capture="environment" className="absolute inset-0 opacity-0 z-20 cursor-pointer" onChange={handleFileChange} />
@@ -394,8 +394,8 @@ export function ReportScreen() {
                           <div className="absolute inset-0 border-2 border-dashed border-white/20 rounded-full animate-spin-slow" />
                        </div>
                        <div className="text-center">
-                         <span className="text-[10px] font-black text-white tracking-[0.4em] uppercase">Iniciar Captura</span>
-                         <p className="text-[8px] text-white/30 font-bold mt-2 tracking-widest">SOPORTA: JPEG, RAW, PNG</p>
+                         <span className="text-[10px] font-bold text-white tracking-[0.4em] uppercase italic">Iniciar Captura</span>
+                         <p className="text-[8px] text-white/30 font-bold mt-2 tracking-widest italic">SOPORTA: JPEG, RAW, PNG</p>
                        </div>
                     </div>
                   )}
