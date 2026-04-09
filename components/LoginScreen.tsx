@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, ChevronRight, Activity, UserPlus, Fingerprint, ShieldCheck, KeyRound, UserCircle } from 'lucide-react';
+import { Mail, Lock, ChevronRight, UserPlus, Fingerprint, ShieldCheck, KeyRound, UserCircle } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -72,17 +72,14 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
         layout
         className="w-full max-w-sm sm:max-w-md relative z-10 flex flex-col items-center"
       >
-        {/* SMALLER LOGO HUD */}
-        <div className="relative group mb-6 sm:mb-8">
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-[32px] sm:rounded-[40px] glass-premium flex items-center justify-center border-white/20 shadow-2xl backdrop-blur-3xl overflow-hidden">
-                <Activity className="w-10 h-10 sm:w-12 sm:h-12 text-cyan-400 animate-pulse" strokeWidth={3} />
-                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/10 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/5 to-transparent h-1 w-full animate-scan" />
-            </div>
+        {/* OFFICIAL LOGO */}
+        <div className="relative mb-8 sm:mb-12">
+            <img 
+              src="/motus.png" 
+              alt="MOTUS" 
+              className="w-48 sm:w-64 h-auto object-contain select-none"
+            />
         </div>
-
-        <h1 className="text-4xl sm:text-5xl font-bold text-white italic tracking-tighter uppercase leading-none mb-1 select-none">MOTUS</h1>
-        <p className="text-[10px] font-bold text-cyan-400/60 uppercase tracking-[0.4em] italic mb-8 sm:mb-10">Intelligence Node</p>
 
         <AnimatePresence mode="wait">
           <motion.form 
