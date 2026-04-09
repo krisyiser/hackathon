@@ -47,7 +47,7 @@ export function IncidentsScreen() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-black px-4 sm:px-6 pt-32 sm:pt-40 pb-48 no-scrollbar relative">
+    <div className="flex-1 overflow-y-auto bg-black px-4 sm:px-6 pt-10 sm:pt-16 pb-48 no-scrollbar relative">
       <div className="mb-12 sm:mb-20 px-2 flex items-end justify-between">
         <div className="flex-1 min-w-0 pr-4">
           <motion.div 

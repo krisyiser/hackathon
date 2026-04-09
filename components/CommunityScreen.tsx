@@ -109,7 +109,7 @@ export function CommunityScreen() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-black pt-32 sm:pt-40 pb-48 no-scrollbar relative font-sans">
+    <div className="flex-1 overflow-y-auto bg-black pt-10 sm:pt-16 pb-48 no-scrollbar relative font-sans">
       
       {/* Header (Responsive Minimal) */}
       <div className="relative z-20 bg-transparent px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between">

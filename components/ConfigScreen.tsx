@@ -121,7 +121,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-32 sm:pt-40 pb-48 no-scrollbar bg-transparent relative">
+    <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-48 no-scrollbar bg-transparent relative">
       
       {/* Reversible Identity Card Container */}
       <div className="mb-28 perspective-1000 relative z-10">

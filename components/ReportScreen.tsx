@@ -2,12 +2,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ShieldAlert, 
-  TrafficCone, 
-  Users, 
-  Mic, 
-  Check, 
+import {
+  ShieldAlert,
+  TrafficCone,
+  Users,
+  Mic,
+  Check,
   Zap,
   Activity,
   Plus,
@@ -68,7 +68,7 @@ export function ReportScreen() {
   const handlePointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    
+
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     buttonCenterRef.current = {
       x: rect.left + rect.width / 2,
@@ -138,10 +138,10 @@ export function ReportScreen() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData(prev => ({ 
-        ...prev, 
-        foto: file, 
-        fotoPreview: URL.createObjectURL(file) 
+      setFormData(prev => ({
+        ...prev,
+        foto: file,
+        fotoPreview: URL.createObjectURL(file)
       }));
     }
   };
@@ -165,9 +165,9 @@ export function ReportScreen() {
       fd.append("titulo", data.titulo);
       fd.append("descripcion", data.descripcion);
       if (data.foto) fd.append("foto", data.foto);
-      
-      const response = await fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
-        method: "POST", 
+
+      const response = await fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", {
+        method: "POST",
         body: fd
       });
 
@@ -181,22 +181,19 @@ export function ReportScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative report-screen-container" ref={containerRef}>
-      
+    <div className="flex-1 flex flex-col px-4 sm:px-6 pt-10 sm:pt-16 pb-48 bg-black select-none touch-none overflow-hidden relative report-screen-container" ref={containerRef}>
+
       {/* HEADER HUD */}
       <div className="w-full mb-2 sm:mb-10 px-2 flex items-center justify-between shrink-0 relative z-20">
         <div className="flex-1 min-w-0 pr-4">
-          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 mb-2 sm:mb-4">
-             <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
-          </motion.div>
-          <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br/><span className="text-white/20">de Alerta.</span></h3>
+          <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br /><span className="text-white/20">de Alerta.</span></h3>
         </div>
-        
+
         {/* BOTÓN DINÁMICO REPORTE AVANZADO */}
-        <motion.button 
+        <motion.button
           onClick={() => setIsFormOpen(true)}
           initial={false}
-          animate={{ 
+          animate={{
             width: isExpanded ? (isMobile ? '190px' : '240px') : '64px',
             backgroundColor: isExpanded ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 30, 30, 0.1)'
           }}
@@ -204,13 +201,13 @@ export function ReportScreen() {
         >
           <div className="flex items-center gap-3 w-full justify-center">
             <div className="relative flex-shrink-0">
-               <Zap className={cn("w-7 h-7 sm:w-8 sm:h-8 text-rose-500 transition-all", isExpanded ? "animate-none" : "animate-pulse")} strokeWidth={4} />
-               {!isExpanded && <div className="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />}
+              <Zap className={cn("w-7 h-7 sm:w-8 sm:h-8 text-rose-500 transition-all", isExpanded ? "animate-none" : "animate-pulse")} strokeWidth={4} />
+              {!isExpanded && <div className="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />}
             </div>
-            
+
             <AnimatePresence>
               {isExpanded && (
-                <motion.span 
+                <motion.span
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
@@ -236,12 +233,12 @@ export function ReportScreen() {
 
         <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10 no-select">
           <div className={cn("absolute inset-0 rounded-full blur-3xl transition-all duration-1000", isListening ? "bg-rose-500/20 scale-125" : "bg-white/5 opacity-10 scale-110")} />
-          
+
           {categories.map((cat) => (
             <motion.div
               key={cat.id}
-              animate={{ 
-                scale: isPressing ? (selectedCategory === cat.id ? 1.4 : 1) : 0, 
+              animate={{
+                scale: isPressing ? (selectedCategory === cat.id ? 1.4 : 1) : 0,
                 opacity: isPressing ? (selectedCategory === cat.id ? 1 : 0.4) : 0,
                 x: isPressing ? Math.cos(cat.angle * (Math.PI / 180)) * d : 0,
                 y: isPressing ? Math.sin(cat.angle * (Math.PI / 180)) * d : 0
@@ -253,12 +250,12 @@ export function ReportScreen() {
               )}
               style={{ boxShadow: selectedCategory === cat.id ? `0 0 30px ${cat.color}66` : 'none' }}
             >
-               <div className="w-full h-full rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: selectedCategory === cat.id ? cat.color : 'rgba(255,255,255,0.05)', color: selectedCategory === cat.id ? '#000' : 'rgba(255,255,255,0.4)' }}>
-                  <cat.icon className="w-7 h-7" strokeWidth={3} />
-               </div>
-               {selectedCategory === cat.id && (
-                 <span className="absolute -bottom-10 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ color: cat.color }}>{cat.label}</span>
-               )}
+              <div className="w-full h-full rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: selectedCategory === cat.id ? cat.color : 'rgba(255,255,255,0.05)', color: selectedCategory === cat.id ? '#000' : 'rgba(255,255,255,0.4)' }}>
+                <cat.icon className="w-7 h-7" strokeWidth={3} />
+              </div>
+              {selectedCategory === cat.id && (
+                <span className="absolute -bottom-10 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ color: cat.color }}>{cat.label}</span>
+              )}
             </motion.div>
           ))}
 
@@ -282,7 +279,7 @@ export function ReportScreen() {
             )}
             <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[scan_3s_linear_infinite]" />
           </button>
-          
+
           <div className={cn("absolute -bottom-16 z-10 text-[11px] font-black uppercase tracking-[0.4em] text-white transition-opacity duration-300 text-center whitespace-pre-wrap leading-relaxed no-select", isPressing ? "opacity-0" : "opacity-40")}>
             {isListening ? "Transmisión Activa..." : "PULSA: Dial de Reporte\nDOBLE: Reporte por Voz"}
           </div>
@@ -292,7 +289,7 @@ export function ReportScreen() {
       {/* FULL REPORT MODAL v2.0 PREMIUM */}
       <AnimatePresence>
         {isFormOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
@@ -306,14 +303,13 @@ export function ReportScreen() {
             {/* NAVBAR MODAL */}
             <div className="sticky top-0 z-50 bg-black/60 backdrop-blur-3xl px-6 py-8 flex items-center justify-between border-b border-white/5">
               <div className="flex flex-col">
-                 <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-[0.3em] mb-1">Motus Intelligence System</span>
-                 <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Reporte detallado</h4>
+                <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Reporte detallado</h4>
               </div>
               <button onClick={() => setIsFormOpen(false)} className="w-14 h-14 rounded-2xl glass-premium flex items-center justify-center border-white/10 active:scale-90 transition-transform"><X className="text-white w-6 h-6" /></button>
             </div>
 
             <div className="p-6 space-y-12 flex-1 pb-4 relative z-10">
-              
+
               {/* CATEGORY SELECTOR TACTICAL */}
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
@@ -348,11 +344,11 @@ export function ReportScreen() {
                     formData.titulo ? "-top-3 text-cyan-400" : "top-5 text-white/80"
                   )}>Título del Suceso</label>
                   <div className="rounded-[32px] glass-premium p-1 border-2 border-white/30 focus-within:border-cyan-400 bg-white/10 transition-all relative">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={formData.titulo}
                       onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
-                      placeholder={formData.titulo ? "" : "Identifique el incidente..."} 
+                      placeholder={formData.titulo ? "" : "Identifique el incidente..."}
                       className="w-full bg-black/50 rounded-[28px] px-6 py-6 text-xl text-white placeholder:text-white/40 outline-none font-bold italic tracking-tight"
                     />
                   </div>
@@ -364,10 +360,10 @@ export function ReportScreen() {
                     formData.descripcion ? "-top-3 text-cyan-400" : "top-5 text-white/80"
                   )}>Bitácora de Detalles</label>
                   <div className="rounded-[32px] glass-premium p-1 border-2 border-white/30 focus-within:border-cyan-400 bg-white/10 transition-all relative">
-                    <textarea 
+                    <textarea
                       value={formData.descripcion}
                       onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
-                      placeholder={formData.descripcion ? "" : "Relate los hechos observados..."} 
+                      placeholder={formData.descripcion ? "" : "Relate los hechos observados..."}
                       rows={5}
                       className="w-full bg-black/50 rounded-[28px] px-6 py-6 text-lg text-white placeholder:text-white/40 outline-none font-bold italic resize-none leading-[1.6]"
                     />
@@ -383,19 +379,19 @@ export function ReportScreen() {
                 </div>
                 <div className="relative aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-white/5 group transition-all active:scale-[0.98]">
                   <input type="file" accept="image/*" capture="environment" className="absolute inset-0 opacity-0 z-20 cursor-pointer" onChange={handleFileChange} />
-                  
+
                   {formData.fotoPreview ? (
                     <img src={formData.fotoPreview} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Preview" />
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
-                       <div className="relative w-20 h-20 flex items-center justify-center">
-                          <Camera className="w-10 h-10 text-white animate-pulse" />
-                          <div className="absolute inset-0 border-2 border-dashed border-white/20 rounded-full animate-spin-slow" />
-                       </div>
-                       <div className="text-center">
-                         <span className="text-[10px] font-bold text-white tracking-[0.4em] uppercase italic">Iniciar Captura</span>
-                         <p className="text-[8px] text-white/30 font-bold mt-2 tracking-widest italic">SOPORTA: JPEG, RAW, PNG</p>
-                       </div>
+                      <div className="relative w-20 h-20 flex items-center justify-center">
+                        <Camera className="w-10 h-10 text-white animate-pulse" />
+                        <div className="absolute inset-0 border-2 border-dashed border-white/20 rounded-full animate-spin-slow" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-[10px] font-bold text-white tracking-[0.4em] uppercase italic">Iniciar Captura</span>
+                        <p className="text-[8px] text-white/30 font-bold mt-2 tracking-widest italic">SOPORTA: JPEG, RAW, PNG</p>
+                      </div>
                     </div>
                   )}
                   {/* HUD Elements over Camera */}
@@ -404,10 +400,10 @@ export function ReportScreen() {
                   <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-rose-500/50" />
                   <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-rose-500/50" />
                 </div>
-                
+
                 {formData.foto && (
-                  <button 
-                    onClick={() => setFormData(p => ({ ...p, foto: null, fotoPreview: null }))} 
+                  <button
+                    onClick={() => setFormData(p => ({ ...p, foto: null, fotoPreview: null }))}
                     className="flex items-center gap-2 mx-auto text-rose-500 text-[10px] font-black uppercase tracking-widest pt-2 active:scale-95"
                   >
                     <X className="w-4 h-4" /> Eliminar Evidencia
@@ -417,16 +413,16 @@ export function ReportScreen() {
             </div>
 
             <div className="w-full pb-32 px-6 pt-2 z-20">
-                 <button 
-                  onClick={() => submitReport(formData)}
-                  className="w-full h-20 bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(16,185,129,0.3)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
-                >
-                  <div className="flex items-center gap-4 text-base">
-                    <Send className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" strokeWidth={3} /> 
-                    ENVIAR
-                  </div>
-                </button>
-              </div>
+              <button
+                onClick={() => submitReport(formData)}
+                className="w-full h-20 bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(16,185,129,0.3)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
+              >
+                <div className="flex items-center gap-4 text-base">
+                  <Send className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" strokeWidth={3} />
+                  ENVIAR
+                </div>
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
