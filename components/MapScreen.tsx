@@ -11,8 +11,8 @@ const MapInner = dynamic(() => import('./MapInner'), {
 
 export function MapScreen() {
   return (
-    <div className="w-full h-full flex flex-col bg-slate-100 overflow-hidden relative">
-      <div id="mapa" className="flex-1 w-full h-full relative z-0">
+    <div className="w-full h-full flex flex-col bg-[#020202] overflow-hidden relative">
+      <div className="flex-1 w-full h-full relative z-0">
         <MapInner />
       </div>
       <Script src="/ubicacion.js" strategy="afterInteractive" />
