@@ -313,7 +313,7 @@ export function ReportScreen() {
               <button onClick={() => setIsFormOpen(false)} className="w-14 h-14 rounded-2xl glass-premium flex items-center justify-center border-white/10 active:scale-90 transition-transform"><X className="text-white w-6 h-6" /></button>
             </div>
 
-            <div className="p-6 space-y-12 flex-1 pb-60 relative z-10">
+            <div className="p-6 space-y-12 flex-1 pb-4 relative z-10">
               
               {/* CATEGORY SELECTOR TACTICAL */}
               <div className="space-y-6">
@@ -417,7 +417,7 @@ export function ReportScreen() {
               </div>
             </div>
 
-            <div className="w-full pb-32 px-6 pt-8 z-20">
+            <div className="w-full pb-32 px-6 pt-2 z-20">
                  <button 
                   onClick={() => submitReport(formData)}
                   className="w-full h-20 bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(16,185,129,0.3)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
