@@ -135,10 +135,35 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
           ) : (
             <>
               Establecer Enlace
-              <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+               <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </>
           )}
         </button>
+
+        <div className="flex items-center gap-4 py-4">
+           <div className="h-px flex-1 bg-white/10" />
+           <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Acceso de Terceros</span>
+           <div className="h-px flex-1 bg-white/10" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+           <button 
+             type="button"
+             onClick={onLogin} 
+             className="flex items-center justify-center gap-3 py-5 rounded-[24px] bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all group active:scale-95"
+           >
+              <div className="w-2.5 h-2.5 rounded-full bg-[#EA4335] shadow-[0_0_10px_rgba(234,67,53,0.5)]" />
+              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest group-hover:text-white transition-colors">Google</span>
+           </button>
+           <button 
+             type="button"
+             onClick={onLogin} 
+             className="flex items-center justify-center gap-3 py-5 rounded-[24px] bg-[#1877F2]/10 border border-[#1877F2]/20 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/30 transition-all group active:scale-95"
+           >
+              <div className="w-2.5 h-2.5 rounded-full bg-[#1877F2] shadow-[0_0_10px_rgba(24,119,242,0.5)]" />
+              <span className="text-[10px] font-black text-white/60 uppercase tracking-widest group-hover:text-white transition-colors">Facebook</span>
+           </button>
+        </div>
 
         <div className="pt-8 flex flex-col items-center gap-4">
            <button type="button" className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] hover:text-white transition-colors">Olvidé mi código operativo</button>
