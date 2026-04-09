@@ -31,6 +31,7 @@ export function ReportScreen() {
   const lastTapTime = useRef<number>(0);
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonCenterRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 640);
@@ -46,289 +47,192 @@ export function ReportScreen() {
     { id: 'entorno' as IncidentType, icon: Activity, label: 'ENTORNO', color: '#14C9D9', angle: 200 },
   ];
 
-  // REAL MOBILE TOUCH SELECTION LOGIC
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isPressing) return;
-
-    // Detect element under finger for touch devices
-    const element = document.elementFromPoint(e.clientX, e.clientY);
-    const categoryEl = element?.closest('[data-category-id]');
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
     
-    if (categoryEl) {
-      const catId = categoryEl.getAttribute('data-category-id') as IncidentType;
-      if (catId !== selectedCategory) {
-        setSelectedCategory(catId);
-        if (navigator.vibrate) navigator.vibrate(15);
+    // Calcular centro del botón para lógica matemática
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    buttonCenterRef.current = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+
+    const centerX = e.clientX;
+    const centerY = e.clientY;
+    
+    setRipples(prev => [...prev, { id: Date.now().toString(), x: centerX, y: centerY, delay: 0 }]);
+
+    const now = Date.now();
+    if (now - lastTapTime.current < 300) {
+      if (isListening) stopListening(); else startListening();
+      lastTapTime.current = 0;
+      return;
+    }
+    lastTapTime.current = now;
+
+    pressTimer.current = setTimeout(() => {
+      setIsPressing(true);
+      if (navigator.vibrate) navigator.vibrate(40);
+    }, 250);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isPressing || !buttonCenterRef.current) return;
+
+    const dx = e.clientX - buttonCenterRef.current.x;
+    const dy = e.clientY - buttonCenterRef.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+    // Si el dedo está lo suficientemente alejado del centro (zona de categorías)
+    if (distance > 60) {
+      let closest = categories[0];
+      let minDiff = 360;
+
+      categories.forEach(cat => {
+        let diff = Math.abs(angle - cat.angle);
+        if (diff > 180) diff = 360 - diff;
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = cat;
+        }
+      });
+
+      // Umbral de precisión: si el dedo está cerca del ángulo de una categoría
+      if (minDiff < 45) {
+        if (selectedCategory !== closest.id) {
+          setSelectedCategory(closest.id);
+          if (navigator.vibrate) navigator.vibrate(10);
+        }
+      } else {
+        setSelectedCategory(null);
       }
     } else {
       setSelectedCategory(null);
     }
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    // Prevent default to stop scrolling/pull-to-refresh
-    if (e.cancelable) e.preventDefault();
-    
-    const centerX = e.clientX;
-    const centerY = e.clientY;
-    const batchId = Date.now();
-    
-    const newRipples = [0, 150, 300].map((delay, i) => ({
-      id: `${batchId}-${i}`,
-      x: centerX,
-      y: centerY,
-      delay: delay / 1000
-    }));
-
-    setRipples(prev => [...prev, ...newRipples]);
-    setTimeout(() => {
-      setRipples(prev => prev.filter(r => !newRipples.find(nr => nr.id === r.id)));
-    }, 2000);
-
-    if (navigator.vibrate) navigator.vibrate(30);
-
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300;
-
-    if (now - lastTapTime.current < DOUBLE_TAP_DELAY) {
-      if (isListening) {
-        stopListening();
-        // VOICE SIMULATION SUCCESS
-        setShowSuccess(true);
-        if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
-        setTimeout(() => setShowSuccess(false), 2000);
-      } else {
-        startListening();
-      }
-      if (navigator.vibrate) navigator.vibrate([30, 30, 30]);
-      lastTapTime.current = 0;
-      return;
-    }
-
-    lastTapTime.current = now;
-
-    pressTimer.current = setTimeout(() => {
-      setIsPressing(true);
-      if (navigator.vibrate) navigator.vibrate(60);
-    }, 350);
-  };
-
   const handlePointerUp = async (e: React.PointerEvent) => {
-    e.preventDefault();
     if (pressTimer.current) clearTimeout(pressTimer.current);
-    
-    // Si estábamos presionando y hay una categoría seleccionada, la enviamos
     if (isPressing && selectedCategory) {
       await submitReport(selectedCategory);
     }
-    
     setIsPressing(false);
     setSelectedCategory(null);
+    buttonCenterRef.current = null;
   };
 
   const submitReport = async (type: IncidentType, description?: string) => {
-    // 1. Obtener coordenadas globales de ubicacion.js
-    const win = window as unknown as { 
-      lat_global?: number; 
-      lng_global?: number;
-    };
-    
+    const win = window as unknown as { lat_global?: number; lng_global?: number; };
     const reportData = {
       lat: win.lat_global || 19.4326,
       lng: win.lng_global || -99.1332,
       tipo: type,
-      descripcion: description || `Reporte de ${type} generado desde MOTUS Mobile`,
-      fecha: new Date().toISOString()
+      descripcion: description || `Reporte de ${type} vía MOTUS Dial`,
     };
 
-    console.log("🚀 Enviando reporte real:", reportData);
-
-    // 2. Mostrar éxito inmediato en el UI (Optimistic UI)
     setShowSuccess(true);
     if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
-
-    // Force clear states to avoid UI hanging
     setIsPressing(false);
     setSelectedCategory(null);
 
     try {
-      const formData = new FormData();
-      formData.append("lat", reportData.lat.toString());
-      formData.append("lng", reportData.lng.toString());
-      formData.append("tipo", reportData.tipo);
-      formData.append("descripcion", reportData.descripcion);
+      const fd = new FormData();
+      Object.entries(reportData).forEach(([k,v]) => fd.append(k, v.toString()));
+      fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
+        method: "POST", body: fd, mode: 'no-cors' 
+      }).catch(e => console.warn("Background send error", e));
+    } catch {}
 
-      const response = await fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", {
-        method: "POST",
-        body: formData,
-        mode: 'no-cors' // Ajuste preventivo para desarrollo
-      });
-
-      console.log("✅ Respuesta del servidor (Reporte):", response.status);
-    } catch (error) {
-      // Silenciamos el error para no interrumpir el demo si el endpoint está caído
-      console.warn("⚠️ Error en envío (Servidor en construcción):", error);
-    }
-
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 2500);
+    setTimeout(() => setShowSuccess(false), 2500);
   };
 
   return (
-    <div 
-      className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative"
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
-      ref={containerRef}
-    >
+    <div className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative" ref={containerRef}>
       
-      {/* Responsive Header for consistency */}
-      <div className="w-full mb-8 sm:mb-20 px-2 flex items-end justify-between shrink-0 pointer-events-auto relative z-20">
+      <div className="w-full mb-8 sm:mb-20 px-2 flex items-end justify-between shrink-0 relative z-20">
         <div className="flex-1 min-w-0 pr-4">
-          <motion.div 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 mb-2 sm:mb-4"
-          >
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 mb-2 sm:mb-4">
              <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
-             <span className="text-[8px] sm:text-[10px] font-black text-rose-500/80 uppercase tracking-widest truncate">Aviso Inmediato</span>
+             <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-widest truncate">Central de Reporte Táctico</span>
           </motion.div>
-          <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.9] mix-blend-difference break-words">Central de<br/><span className="text-white/20">Reporte.</span></h3>
+          <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br/><span className="text-white/20">de Alerta.</span></h3>
         </div>
-        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl sm:rounded-[32px] glass-premium flex items-center justify-center border-white/10 shadow-2xl relative group overflow-hidden shrink-0">
-           <Zap className="w-7 h-7 sm:w-10 sm:h-10 text-rose-500 animate-pulse" strokeWidth={3} />
-        </div>
+        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl glass-premium flex items-center justify-center border-white/10 shadow-2xl shrink-0"><Zap className="w-7 h-7 sm:w-10 sm:h-10 text-rose-500 animate-pulse" strokeWidth={3} /></div>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center relative w-full h-full">
-      
-      {/* Fullscreen Ripple Layer */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <AnimatePresence>
-          {ripples.map(ripple => (
-            <motion.div
-              key={ripple.id}
-              initial={{ scale: 0, opacity: 0.5 }}
-              animate={{ scale: 15, opacity: 0 }}
-              transition={{ duration: 1.5, delay: ripple.delay, ease: "easeOut" }}
-              className="absolute rounded-full border-[2px] border-rose-500/30"
-              style={{
-                width: 100,
-                height: 100,
-                left: ripple.x - 50,
-                top: ripple.y - 50,
-                boxShadow: '0 0 40px rgba(242, 19, 20, 0.2)'
-              }}
-            />
-          ))}
-        </AnimatePresence>
-      </div>
+        {/* Ripples */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <AnimatePresence>
+            {ripples.map(r => (
+              <motion.div key={r.id} initial={{ scale: 0, opacity: 0.5 }} animate={{ scale: 20, opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="absolute rounded-full border-[2px] border-rose-500/30" style={{ width: 100, height: 100, left: r.x - 50, top: r.y - 50 }} onAnimationComplete={() => setRipples(prev => prev.filter(p => p.id !== r.id))} />
+            ))}
+          </AnimatePresence>
+        </div>
 
-      <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10">
-        
-        <div className={cn(
-          "absolute inset-0 rounded-full blur-3xl transition-all duration-1000",
-          isListening ? "bg-rose-500/20 scale-125" : "bg-white/5 opacity-20 scale-110"
-        )} />
-        
-        {/* Radial Nodes */}
-        <AnimatePresence>
-          {isPressing && (
-            <>
-              {categories.map((cat) => (
-                <motion.div
-                  key={cat.id}
-                  data-category-id={cat.id}
-                  initial={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
-                  animate={{ 
-                    scale: selectedCategory === cat.id ? 1.6 : 1, 
-                    opacity: 1,
-                    filter: 'blur(0px)',
-                    x: Math.cos(cat.angle * (Math.PI / 180)) * d,
-                    y: Math.sin(cat.angle * (Math.PI / 180)) * d
-                  }}
-                  exit={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
-                  className={cn(
-                    "absolute w-16 h-16 rounded-full glass-premium flex flex-col items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto",
-                    selectedCategory === cat.id ? "border-white/60" : "border-white/10 opacity-40 bg-white/5"
-                  )}
-                  style={{ 
-                    boxShadow: selectedCategory === cat.id ? `0 0 20px ${cat.color}66` : 'none'
-                  }}
-                >
-                   <div 
-                     className="w-full h-full rounded-full flex items-center justify-center pointer-events-none transition-all"
-                     style={{ 
-                       backgroundColor: selectedCategory === cat.id ? cat.color : 'rgba(255,255,255,0.05)',
-                       color: selectedCategory === cat.id ? '#000' : 'rgba(255,255,255,0.4)'
-                     }}
-                   >
-                      <cat.icon className="w-8 h-8" strokeWidth={3} />
-                   </div>
-                   <AnimatePresence>
-                     {selectedCategory === cat.id && (
-                       <motion.span 
-                         initial={{ opacity: 0, y: 5 }}
-                         animate={{ opacity: 1, y: 0 }}
-                         className="absolute -bottom-10 text-[12px] font-black uppercase tracking-widest whitespace-nowrap"
-                         style={{ color: cat.color }}
-                       >
-                         {cat.label}
-                       </motion.span>
-                     )}
-                   </AnimatePresence>
-                </motion.div>
-              ))}
-            </>
-          )}
-        </AnimatePresence>
-
-        <button
-          onPointerDown={handlePointerDown}
-          className={cn(
-            "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-500 flex items-center justify-center overflow-hidden active:scale-95 group select-none touch-none",
-            isPressing ? "bg-white/20 scale-[0.85] shadow-[0_0_100px_rgba(255,255,255,0.2)]" : "glass-premium hover:bg-white/10",
-            isListening && "border-rose-500 shadow-[0_0_60px_rgba(242,19,20,0.4)]"
-          )}
-          style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
-        >
-          {showSuccess ? (
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex flex-col items-center">
-               <div className="p-6 sm:p-8 bg-emerald-500/30 rounded-full border border-emerald-500/50">
-                  <Check className="w-16 h-16 sm:w-20 sm:h-20 text-white" strokeWidth={4} />
-               </div>
-            </motion.div>
-          ) : (
-            <div className="relative flex flex-col items-center">
-              {isListening ? (
-                <Mic className="w-16 h-16 sm:w-20 sm:h-20 text-rose-500 animate-pulse" strokeWidth={3} />
-              ) : (
-                <Plus className={cn(
-                  "w-20 h-20 sm:w-24 h-24 transition-all duration-700",
-                  isPressing ? "text-white rotate-45 scale-125" : "text-white/40"
-                )} strokeWidth={2} />
-              )}
-            </div>
-          )}
+        <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10">
+          <div className={cn("absolute inset-0 rounded-full blur-3xl transition-all duration-1000", isListening ? "bg-rose-500/20 scale-125" : "bg-white/5 opacity-10 scale-110")} />
           
-          <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[scan_3s_linear_infinite]" />
-        </button>
+          {/* Categorías Radiales */}
+          <AnimatePresence>
+            {isPressing && categories.map((cat) => (
+              <motion.div
+                key={cat.id}
+                initial={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
+                animate={{ 
+                  scale: selectedCategory === cat.id ? 1.4 : 1, 
+                  opacity: 1, filter: 'blur(0px)',
+                  x: Math.cos(cat.angle * (Math.PI / 180)) * d,
+                  y: Math.sin(cat.angle * (Math.PI / 180)) * d
+                }}
+                exit={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
+                className={cn(
+                  "absolute w-16 h-16 rounded-full glass-premium flex items-center justify-center border-white/10 transition-all duration-200",
+                  selectedCategory === cat.id ? "border-white/60 bg-white/20" : "opacity-40"
+                )}
+                style={{ boxShadow: selectedCategory === cat.id ? `0 0 30px ${cat.color}66` : 'none' }}
+              >
+                 <div className="w-full h-full rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: selectedCategory === cat.id ? cat.color : 'rgba(255,255,255,0.05)', color: selectedCategory === cat.id ? '#000' : 'rgba(255,255,255,0.4)' }}>
+                    <cat.icon className="w-7 h-7" strokeWidth={3} />
+                 </div>
+                 {selectedCategory === cat.id && (
+                   <motion.span initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="absolute -bottom-10 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ color: cat.color }}>{cat.label}</motion.span>
+                 )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
-        <AnimatePresence>
-          {!isPressing && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute -bottom-24 z-10 text-[13px] font-black uppercase tracking-[0.4em] text-white opacity-60 text-center whitespace-pre-wrap leading-relaxed select-none"
-            >
-              {isListening ? "Escuchando Voz..." : "Mantén: Reporte\n2 Toques: Voz"}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
+          <button
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            className={cn(
+              "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-500 flex items-center justify-center overflow-hidden active:scale-95 group select-none touch-none",
+              isPressing ? "bg-white/20 scale-[0.8] shadow-[0_0_100px_rgba(255,255,255,0.2)]" : "glass-premium hover:bg-white/5",
+              isListening && "border-rose-500 shadow-[0_0_60px_rgba(242,19,20,0.5)]"
+            )}
+          >
+            {showSuccess ? (
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="p-6 bg-emerald-500/30 rounded-full border border-emerald-500/50"><Check className="w-16 h-16 sm:w-20 sm:h-20 text-white" strokeWidth={4} /></motion.div>
+            ) : (
+              <div className="relative flex flex-col items-center">
+                {isListening ? <Mic className="w-16 h-16 text-rose-500 animate-pulse" strokeWidth={3} /> : <Plus className={cn("w-20 h-20 transition-all duration-700", isPressing ? "text-white rotate-45 scale-125" : "text-white/30")} strokeWidth={2} />}
+              </div>
+            )}
+            <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[scan_3s_linear_infinite]" />
+          </button>
+          
+          <AnimatePresence>
+            {!isPressing && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="absolute -bottom-24 z-10 text-[11px] font-black uppercase tracking-[0.4em] text-white opacity-40 text-center whitespace-pre-wrap leading-relaxed select-none">
+                {isListening ? "Transmisión Activa..." : "PULSA: Dial de Reporte\nDOBLE: Reporte por Voz"}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
