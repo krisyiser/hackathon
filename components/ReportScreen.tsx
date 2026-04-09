@@ -13,7 +13,9 @@ import {
   Plus,
   Camera,
   X,
-  Send
+  Send,
+  AlertTriangle,
+  ChevronRight
 } from 'lucide-react';
 import { IncidentType } from '@/types';
 import { useVoiceReport } from '@/hooks/useVoiceReport';
@@ -29,6 +31,7 @@ export function ReportScreen() {
   const [selectedCategory, setSelectedCategory] = useState<IncidentType | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [ripples, setRipples] = useState<{ id: string; x: number; y: number; delay: number }[]>([]);
   const { startListening, stopListening, isListening } = useVoiceReport();
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -48,6 +51,9 @@ export function ReportScreen() {
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 640);
+    // Auto-collapse button after 3 seconds
+    const timer = setTimeout(() => setIsExpanded(false), 3500);
+    return () => clearTimeout(timer);
   }, []);
 
   const d = isMobile ? 125 : 160;
@@ -169,7 +175,7 @@ export function ReportScreen() {
       const responseText = await response.text();
       console.log("📡 Respuesta bruta del servidor:", responseText);
     } catch (e) {
-      console.warn("⚠️ Error de conexión:", e);
+      console.warn("⚠️ Error de envío:", e);
     }
 
     setTimeout(() => setShowSuccess(false), 2500);
@@ -178,24 +184,47 @@ export function ReportScreen() {
   return (
     <div className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative report-screen-container" ref={containerRef}>
       
-      <div className="w-full mb-8 sm:mb-20 px-2 flex items-end justify-between shrink-0 relative z-20">
+      {/* HEADER HUD */}
+      <div className="w-full mb-8 sm:mb-20 px-2 flex items-center justify-between shrink-0 relative z-20">
         <div className="flex-1 min-w-0 pr-4">
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 mb-2 sm:mb-4">
              <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
-             <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-widest truncate">Central de Reporte Táctico</span>
+             <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-[0.2em] truncate">Terminal de Comunicaciones v2.0</span>
           </motion.div>
           <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br/><span className="text-white/20">de Alerta.</span></h3>
         </div>
         
-        {/* BOTÓN FULL REPORT */}
-        <button 
+        {/* BOTÓN DINÁMICO REPORTE AVANZADO */}
+        <motion.button 
           onClick={() => setIsFormOpen(true)}
-          className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl glass-premium flex items-center justify-center border-white/10 shadow-2xl shrink-0 active:scale-90 transition-transform group relative overflow-hidden"
+          initial={false}
+          animate={{ 
+            width: isExpanded ? (isMobile ? '160px' : '220px') : '64px',
+            backgroundColor: isExpanded ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 30, 30, 0.1)'
+          }}
+          className="h-16 sm:h-20 rounded-2xl glass-premium flex items-center px-4 border-white/10 shadow-2xl shrink-0 active:scale-95 transition-all overflow-hidden relative group"
         >
-          <Zap className="w-7 h-7 sm:w-10 sm:h-10 text-rose-500 animate-pulse relative z-10" strokeWidth={3} />
+          <div className="flex items-center gap-3 w-full justify-center">
+            <div className="relative flex-shrink-0">
+               <Zap className={cn("w-7 h-7 sm:w-8 sm:h-8 text-rose-500 transition-all", isExpanded ? "animate-none" : "animate-pulse")} strokeWidth={4} />
+               {!isExpanded && <div className="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />}
+            </div>
+            
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.span 
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  className="text-[10px] font-black text-white whitespace-nowrap tracking-widest uppercase italic"
+                >
+                  Reporte Avanzado
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
           <div className="absolute inset-0 bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-ping" />
-        </button>
+        </motion.button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center relative w-full h-full">
@@ -242,7 +271,7 @@ export function ReportScreen() {
             onPointerCancel={handlePointerUp}
             className={cn(
               "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-500 flex items-center justify-center overflow-hidden active:scale-95 group no-select touch-none",
-              isPressing ? "bg-white/20 scale-[0.8] shadow-[0_0_100px_rgba(255,255,255,0.2)]" : "glass-premium hover:bg-white/5",
+              isPressing ? "bg-white/20 scale-[0.8] shadow-[0_0_100px_rgba(255,255,255,0.2)]" : "glass-premium border-white/5",
               isListening && "border-rose-500 shadow-[0_0_60px_rgba(242,19,20,0.5)]"
             )}
           >
@@ -262,97 +291,144 @@ export function ReportScreen() {
         </div>
       </div>
 
-      {/* FULL REPORT MODAL */}
+      {/* FULL REPORT MODAL v2.0 PREMIUM */}
       <AnimatePresence>
         {isFormOpen && (
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[500] bg-black/90 backdrop-blur-2xl flex flex-col p-6 no-scrollbar overflow-y-auto"
+            initial={{ opacity: 0, y: '100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-[500] bg-black flex flex-col no-scrollbar overflow-y-auto"
           >
-            <div className="flex items-center justify-between mb-10 pt-4">
-              <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase">Reporte Detallado</h4>
-              <button onClick={() => setIsFormOpen(false)} className="w-12 h-12 rounded-full glass-premium flex items-center justify-center border-white/10 active:scale-90"><X className="text-white" /></button>
+            {/* Background Texture Overlay */}
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none" />
+            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-rose-500/10 to-transparent pointer-events-none" />
+
+            {/* NAVBAR MODAL */}
+            <div className="sticky top-0 z-50 bg-black/60 backdrop-blur-3xl px-6 py-8 flex items-center justify-between border-b border-white/5">
+              <div className="flex flex-col">
+                 <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-[0.3em] mb-1">Motus Intelligence System</span>
+                 <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Generar Alerta</h4>
+              </div>
+              <button onClick={() => setIsFormOpen(false)} className="w-14 h-14 rounded-2xl glass-premium flex items-center justify-center border-white/10 active:scale-90 transition-transform"><X className="text-white w-6 h-6" /></button>
             </div>
 
-            <div className="space-y-8 flex-1">
-              {/* TIPO SELECTOR */}
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Categoría del Incidente</label>
-                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            <div className="p-6 space-y-12 flex-1 pb-40 relative z-10">
+              
+              {/* CATEGORY SELECTOR TACTICAL */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-[1px] bg-rose-500" />
+                  <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Tipo de Incidente</label>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
                   {categories.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setFormData(prev => ({ ...prev, tipo: cat.id }))}
                       className={cn(
-                        "flex-shrink-0 w-20 h-20 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all border",
-                        formData.tipo === cat.id ? "bg-white/10 border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.1)]" : "bg-white/5 border-white/5 opacity-40"
+                        "relative h-24 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all duration-500 overflow-hidden",
+                        formData.tipo === cat.id ? "glass-premium border-white/30 scale-105" : "bg-white/5 border-transparent opacity-30 grayscale"
                       )}
                     >
-                      <cat.icon className="w-6 h-6" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} />
-                      <span className="text-[8px] font-bold tracking-tight">{cat.label}</span>
+                      {formData.tipo === cat.id && (
+                        <motion.div layoutId="glow" className="absolute inset-0 blur-2xl opacity-20" style={{ backgroundColor: cat.color }} />
+                      )}
+                      <cat.icon className="w-7 h-7 relative z-10" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} />
+                      <span className="text-[8px] font-black tracking-widest uppercase relative z-10">{cat.id}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* TITULO */}
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Título del Reporte</label>
-                <div className="rounded-3xl glass-premium p-1 border border-white/10 focus-within:border-cyan-500/50 transition-colors">
-                  <input 
-                    type="text" 
-                    value={formData.titulo}
-                    onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
-                    placeholder="Ej. Bache profundo en Av. Loreto" 
-                    className="w-full bg-transparent px-6 py-5 text-white placeholder:text-white/10 outline-none font-bold"
-                  />
+              {/* INPUT FIELDS HUD STYLE */}
+              <div className="space-y-10">
+                <div className="relative group">
+                  <label className={cn(
+                    "absolute left-6 transition-all font-black text-[9px] uppercase tracking-[0.3em]",
+                    formData.titulo ? "-top-3 text-rose-500" : "top-5 text-white/20"
+                  )}>Título del Suceso</label>
+                  <div className="rounded-[32px] glass-premium p-[1px] bg-gradient-to-r from-white/10 to-transparent focus-within:from-rose-500/40 transition-all">
+                    <input 
+                      type="text" 
+                      value={formData.titulo}
+                      onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
+                      placeholder={formData.titulo ? "" : "Identifique el incidente..."} 
+                      className="w-full bg-black/40 rounded-[31px] px-6 py-5 text-lg text-white placeholder:text-white/10 outline-none font-bold italic"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative group">
+                  <label className={cn(
+                    "absolute left-6 transition-all font-black text-[9px] uppercase tracking-[0.3em]",
+                    formData.descripcion ? "-top-3 text-rose-500" : "top-5 text-white/20"
+                  )}>Bitácora de Detalles</label>
+                  <div className="rounded-[32px] glass-premium p-[1px] bg-gradient-to-r from-white/10 to-transparent focus-within:from-rose-500/40 transition-all">
+                    <textarea 
+                      value={formData.descripcion}
+                      onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
+                      placeholder={formData.descripcion ? "" : "Relate los hechos observados..."} 
+                      rows={5}
+                      className="w-full bg-black/40 rounded-[31px] px-6 py-5 text-white placeholder:text-white/10 outline-none font-medium resize-none leading-relaxed"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* DESCRIPCION */}
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Descripción Detallada</label>
-                <div className="rounded-3xl glass-premium p-1 border border-white/10 focus-within:border-cyan-500/50 transition-colors">
-                  <textarea 
-                    value={formData.descripcion}
-                    onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
-                    placeholder="Describe los detalles de lo que está sucediendo..." 
-                    rows={4}
-                    className="w-full bg-transparent px-6 py-5 text-white placeholder:text-white/10 outline-none font-medium resize-none"
-                  />
+              {/* CAMERA INTERFACE */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-[1px] bg-rose-500" />
+                  <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Captura de Evidencia</label>
                 </div>
-              </div>
-
-              {/* FOTO */}
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Evidencia Fotográfica</label>
-                <div className="flex gap-4 items-center">
-                  <label className="flex-1 h-32 rounded-3xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 hover:bg-white/5 cursor-pointer transition-all active:scale-[0.98]">
-                    {formData.fotoPreview ? (
-                      <img src={formData.fotoPreview} className="w-full h-full object-cover rounded-3xl" alt="Preview" />
-                    ) : (
-                      <>
-                        <Camera className="w-8 h-8 text-white/20" />
-                        <span className="text-[10px] font-black text-white/20">TOMAR FOTO O SUBIR</span>
-                      </>
-                    )}
-                    <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
-                  </label>
-                  {formData.foto && (
-                    <button onClick={() => setFormData(p => ({ ...p, foto: null, fotoPreview: null }))} className="w-12 h-12 rounded-full glass-premium border-white/10 flex items-center justify-center text-rose-500 active:scale-90"><X /></button>
+                <div className="relative aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-white/5 group transition-all active:scale-[0.98]">
+                  <input type="file" accept="image/*" capture="environment" className="absolute inset-0 opacity-0 z-20 cursor-pointer" onChange={handleFileChange} />
+                  
+                  {formData.fotoPreview ? (
+                    <img src={formData.fotoPreview} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Preview" />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+                       <div className="relative w-20 h-20 flex items-center justify-center">
+                          <Camera className="w-10 h-10 text-white animate-pulse" />
+                          <div className="absolute inset-0 border-2 border-dashed border-white/20 rounded-full animate-spin-slow" />
+                       </div>
+                       <div className="text-center">
+                         <span className="text-[10px] font-black text-white tracking-[0.4em] uppercase">Iniciar Captura</span>
+                         <p className="text-[8px] text-white/30 font-bold mt-2 tracking-widest">SOPORTA: JPEG, RAW, PNG</p>
+                       </div>
+                    </div>
                   )}
+                  {/* HUD Elements over Camera */}
+                  <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-rose-500/50" />
+                  <div className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-rose-500/50" />
+                  <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-rose-500/50" />
+                  <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-rose-500/50" />
                 </div>
+                
+                {formData.foto && (
+                  <button 
+                    onClick={() => setFormData(p => ({ ...p, foto: null, fotoPreview: null }))} 
+                    className="flex items-center gap-2 mx-auto text-rose-500 text-[10px] font-black uppercase tracking-widest pt-2 active:scale-95"
+                  >
+                    <X className="w-4 h-4" /> Eliminar Evidencia
+                  </button>
+                )}
               </div>
             </div>
 
-            <div className="mt-12 pb-10">
-              <button 
+            {/* ACTION BAR */}
+            <div className="fixed bottom-10 left-6 right-6 z-[60]">
+               <button 
                 onClick={() => submitReport(formData)}
-                className="w-full py-6 bg-white text-black font-black uppercase tracking-[0.3em] rounded-[32px] shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3"
+                className="w-full h-20 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(225,29,72,0.4)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
               >
-                <Send className="w-5 h-5" /> Enviar Reporte Táctico
+                <div className="flex items-center gap-4">
+                  <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
+                  Transmitir Alerta
+                </div>
+                <ChevronRight className="w-6 h-6 opacity-40" />
               </button>
             </div>
           </motion.div>
@@ -370,6 +446,17 @@ export function ReportScreen() {
         .report-screen-container {
           touch-action: none !important;
           -webkit-tap-highlight-color: transparent;
+        }
+        @keyframes scan {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(500%); }
+        }
+        .animate-spin-slow {
+          animation: spin 8s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
