@@ -14,7 +14,6 @@ import {
   Camera,
   X,
   Send,
-  AlertTriangle,
   ChevronRight
 } from 'lucide-react';
 import { IncidentType } from '@/types';
