@@ -87,6 +87,29 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
   const [isFlipped, setIsFlipped] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
+
+  useEffect(() => {
+    setDemoMode(localStorage.getItem('motus_demo_mode') === 'true');
+  }, []);
+
+  const handleDemoTrigger = () => {
+    const newCount = tapCount + 1;
+    if (newCount >= 5) {
+      const newState = !demoMode;
+      setDemoMode(newState);
+      localStorage.setItem('motus_demo_mode', newState.toString());
+      setTapCount(0);
+      if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+      alert(newState ? "MODO DEMO ACTIVADO (OFFLINE SIM)" : "MODO REAL ACTIVADO (LIVE SERVER)");
+    } else {
+      setTapCount(newCount);
+      // Auto-reset tap count after 2 seconds of inactivity
+      const timer = setTimeout(() => setTapCount(0), 2000);
+      return () => clearTimeout(timer);
+    }
+  };
 
   const cycleVibracion = () => {
     const options = ['Fuerte', 'Medio', 'Suave', 'Apagada'];
@@ -355,6 +378,21 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
               <LogOut className="w-8 h-8" strokeWidth={3} />
               Cerrar Protocolo
            </button>
+        </div>
+        
+        {/* Hidden Demo Trigger */}
+        <div 
+          className="pt-10 flex flex-col items-center gap-1 opacity-20 hover:opacity-100 transition-opacity pb-10"
+          onClick={handleDemoTrigger}
+        >
+           <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] font-mono select-none">
+             BUILD: v4.2.0-ELITE
+           </span>
+           {demoMode && (
+             <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest animate-pulse">
+               !!! MODO DEMO ACTIVO !!!
+             </span>
+           )}
         </div>
       </div>
 

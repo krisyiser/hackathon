@@ -12,6 +12,32 @@ export function useRealtimeReports() {
     fetchStarted.current = true;
 
     try {
+      // Check for Demo Mode (Hidden switch)
+      const isDemoMode = localStorage.getItem('motus_demo_mode') === 'true';
+      
+      if (isDemoMode) {
+        console.log("DEMO MODE ACTIVE: Loading simulated tactical data...");
+        const demoResponse = await fetch("/demo_reports.json");
+        const demoData = await demoResponse.json();
+        const mappedReports: Report[] = demoData.map((item: any, index: number) => ({
+          id: `demo-${index}-${Date.now()}`,
+          created_at: item.fecha || new Date().toISOString(),
+          type: item.tipo?.toLowerCase() || 'entorno',
+          linea: item.titulo || 'Simulación Motus',
+          description: item.descripcion || 'Dato simulado para demostración.',
+          intensidad: 3,
+          lat: parseFloat(item.lat),
+          lng: parseFloat(item.lng),
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
+          metadata: {
+            calle: item.direccion || item.calle,
+            direccion: item.direccion_objeto || item.direccion
+          }
+        }));
+        setReports(mappedReports);
+        return;
+      }
+
       // Intentar obtener ubicación global (compartida con ubicacion.js)
       const lat = (window as any).lat_global || "19.4326";
       const lng = (window as any).lng_global || "-99.1332";
