@@ -1,9 +1,16 @@
+var lat_global = "";
+var lng_global = "";
+var accuracy_global = "";
+var timestamp_global = "";
+var marcadores = ["seguridad","emergencia","obstruccion","saturacion","entorno"];
+
 function pedirUbicacion(options = {}) {
     const defaultOptions = {
         enableHighAccuracy: true,
         timeout: 12000,
         maximumAge: 0
     }
+
 
     const geoOptions = { ...defaultOptions, ...options }
 
@@ -72,8 +79,6 @@ function pedirUbicacion(options = {}) {
 }
 
 pedirUbicacion()
-
-marcadores=["seguridad","emergencia","obstruccion","saturacion","entorno"]
 
 function enviarCoordenadas() {
     let check_evidencia = 0 // <- resetea cada envío

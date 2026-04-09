@@ -184,13 +184,13 @@ export function ReportScreen() {
     <div className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative report-screen-container" ref={containerRef}>
       
       {/* HEADER HUD */}
-      <div className="w-full mb-8 sm:mb-20 px-2 flex items-center justify-between shrink-0 relative z-20">
+      <div className="w-full mb-2 sm:mb-10 px-2 flex items-center justify-between shrink-0 relative z-20">
         <div className="flex-1 min-w-0 pr-4">
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 mb-2 sm:mb-4">
              <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
              <span className="text-[10px] font-black text-rose-500/80 uppercase tracking-[0.2em] truncate">Terminal de Comunicaciones v2.0</span>
           </motion.div>
-          <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br/><span className="text-white/20">de Alerta.</span></h3>
+          <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br/><span className="text-white/20">de Alerta.</span></h3>
         </div>
         
         {/* BOTÓN DINÁMICO REPORTE AVANZADO */}
@@ -284,7 +284,7 @@ export function ReportScreen() {
             <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[scan_3s_linear_infinite]" />
           </button>
           
-          <div className={cn("absolute -bottom-24 z-10 text-[11px] font-black uppercase tracking-[0.4em] text-white transition-opacity duration-300 text-center whitespace-pre-wrap leading-relaxed no-select", isPressing ? "opacity-0" : "opacity-40")}>
+          <div className={cn("absolute -bottom-16 z-10 text-[11px] font-black uppercase tracking-[0.4em] text-white transition-opacity duration-300 text-center whitespace-pre-wrap leading-relaxed no-select", isPressing ? "opacity-0" : "opacity-40")}>
             {isListening ? "Transmisión Activa..." : "PULSA: Dial de Reporte\nDOBLE: Reporte por Voz"}
           </div>
         </div>
@@ -313,7 +313,7 @@ export function ReportScreen() {
               <button onClick={() => setIsFormOpen(false)} className="w-14 h-14 rounded-2xl glass-premium flex items-center justify-center border-white/10 active:scale-90 transition-transform"><X className="text-white w-6 h-6" /></button>
             </div>
 
-            <div className="p-6 space-y-12 flex-1 pb-40 relative z-10">
+            <div className="p-6 space-y-12 flex-1 pb-60 relative z-10">
               
               {/* CATEGORY SELECTOR TACTICAL */}
               <div className="space-y-6">
@@ -418,7 +418,7 @@ export function ReportScreen() {
             </div>
 
             {/* ACTION BAR */}
-            <div className="fixed bottom-10 left-6 right-6 z-[60]">
+            <div className="fixed bottom-[120px] left-6 right-6 z-[60]">
                <button 
                 onClick={() => submitReport(formData)}
                 className="w-full h-20 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-[0.4em] rounded-[32px] shadow-[0_20px_60px_rgba(225,29,72,0.4)] active:scale-95 transition-all flex items-center justify-center gap-4 group"
