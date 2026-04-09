@@ -145,11 +145,11 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
                   <div className="w-full h-full rounded-[50px] bg-gradient-to-tr from-slate-900 to-black flex items-center justify-center relative overflow-hidden">
                      <motion.img 
                        initial={{ y: 0 }}
-                       animate={{ y: [-5, 5, -5] }}
-                       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                       src="https://api.dicebear.com/7.x/micah/svg?seed=MotusElite&backgroundColor=transparent" 
+                       animate={{ y: [-8, 8, -8] }}
+                       transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                       src="https://em-content.zobj.net/source/apple/391/technologist_1f9d1-200d-1f4bb.png" 
                        alt="3D Avatar" 
-                       className="w-[120%] h-[120%] object-cover object-top scale-110" 
+                       className="w-[90%] h-[90%] object-contain" 
                      />
                      <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 to-transparent" />
                   </div>
