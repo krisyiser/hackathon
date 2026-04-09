@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function SplashScreen({ onComplete }: { onComplete: () => void }) {
   const [isFinished, setIsFinished] = useState(false);
@@ -15,103 +15,112 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-[#020202] flex flex-col items-center justify-center overflow-hidden">
-      {/* Dynamic Background Depth */}
-      <div className="absolute inset-0 bg-[#050505]" />
+    <div className="fixed inset-0 z-[1000] bg-[#010101] flex flex-col items-center justify-center overflow-hidden">
+      {/* Absolute Dark Void */}
+      <div className="absolute inset-0 bg-black" />
       
-      {/* 1. REAR AMBIENT GLOWS (Vibrant Hues) */}
-      <motion.div 
-        animate={{ opacity: [0.1, 0.2, 0.1], scale: [1, 1.1, 1] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-[800px] h-[800px] bg-[radial-gradient(circle,_rgba(255,45,85,0.08)_0%,_transparent_70%)] -left-40 -top-40 blur-[100px]"
-      />
-      <motion.div 
-        animate={{ opacity: [0.1, 0.2, 0.1], scale: [1, 1.1, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute w-[800px] h-[800px] bg-[radial-gradient(circle,_rgba(50,173,230,0.08)_0%,_transparent_70%)] -right-40 -bottom-40 blur-[100px]"
-      />
-
-      {/* OFFICIAL LOGO HUD CONTAINER */}
-      <div className="relative w-[320px] sm:w-[500px] flex items-center justify-center translate-y-[-20px]">
-        {/* Neon Wrapping Light Frame (Subtle outline) */}
+      {/* CINEMATIC REAR GLOWS (Pulsing background) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="absolute inset-0 border-x border-cyan-400/20 rounded-[100px] blur-sm scale-110 pointer-events-none"
+          animate={{ 
+            opacity: isFinished ? 0.3 : [0.05, 0.15, 0.05, 0.2, 0.1],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/10 blur-[120px] rounded-full"
         />
+        <motion.div 
+          animate={{ 
+            opacity: isFinished ? 0.2 : [0.02, 0.1, 0.02, 0.15, 0.05],
+          }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-rose-500/5 blur-[150px] rounded-full"
+        />
+      </div>
 
-        {/* Cinematic Backdrop Glow */}
+      {/* THE LOGO ENGINE (Flickering Sign) */}
+      <div className="relative w-[300px] sm:w-[450px] flex items-center justify-center px-10">
+        
+        {/* Glow halo behind the sign */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isFinished ? 0.7 : [0, 0.1, 0.05, 0.3, 0.1, 0.4] }}
-          transition={{ duration: 4, times: [0, 0.1, 0.2, 0.3, 0.4, 1] }}
-          className="absolute inset-0 bg-white/[0.03] blur-[120px] rounded-full"
+          animate={{ 
+            opacity: isFinished ? 0.6 : [0, 0.2, 0.05, 0.4, 0.1, 0.5, 0.2, 0.8],
+          }}
+          transition={{ 
+            duration: 3, 
+            times: [0, 0.1, 0.15, 0.2, 0.25, 0.35, 0.4, 1],
+            repeat: Infinity,
+            repeatDelay: 5
+          }}
+          className="absolute inset-0 bg-cyan-400/20 blur-[80px] rounded-full"
         />
 
-        {/* THE LOGO ENGINE */}
-        <div className="relative overflow-hidden w-full h-[180px] flex items-center justify-center">
-          
-          {/* LOGO PNG WITH FLICKER ANIMATION */}
+        <div className="relative z-10 w-full h-auto">
+          {/* THE LOGO PNG */}
           <motion.img 
             src="/motus.png"
             alt="MOTUS OFFICIAL"
-            className="w-full h-auto object-contain relative z-10"
-            initial={{ opacity: 0, scale: 0.95 }}
+            className="w-full h-auto object-contain"
+            initial={{ opacity: 0.05, filter: 'brightness(0.3) grayscale(0.2)' }}
             animate={{ 
-                opacity: isFinished ? 1 : [0, 0, 1, 0.2, 1, 0.4, 1, 0.8, 1],
+                opacity: isFinished ? 1 : [0.05, 0.1, 0.8, 0.1, 1, 0.3, 1, 0.5, 1],
                 filter: isFinished 
-                    ? 'brightness(1.1) drop-shadow(0 0 30px rgba(50,173,230,0.7)) drop-shadow(0 0 10px white)' 
-                    : 'brightness(1) drop-shadow(0 0 10px rgba(50,173,230,0.3))',
-                scale: 1
+                    ? 'brightness(1.2) drop-shadow(0 0 35px rgba(50,173,230,0.8))' 
+                    : [
+                        'brightness(0.3) drop-shadow(0 0 0px transparent)',
+                        'brightness(1.5) drop-shadow(0 0 20px rgba(50,173,230,1))',
+                        'brightness(0.5) drop-shadow(0 0 5px rgba(50,173,230,0.5))',
+                        'brightness(1.8) drop-shadow(0 0 40px rgba(50,173,230,1))'
+                      ],
             }}
             transition={{ 
                 duration: 4, 
-                times: [0, 0.5, 0.52, 0.55, 0.6, 0.65, 0.7, 0.8, 1],
-                type: "spring",
-                stiffness: 100
+                times: [0, 0.1, 0.12, 0.15, 0.2, 0.25, 0.3, 0.4, 1],
+                ease: "easeInOut",
+                repeat: isFinished ? 0 : Infinity,
+                repeatDelay: 4
             }}
           />
 
-          {/* Reveal Wipe Layer */}
+          {/* Micro-sparkle overlay (The 'buzzing' light effect) */}
           <motion.div 
-            initial={{ x: '-100%' }}
-            animate={{ x: '100%' }}
-            transition={{ duration: 4, ease: "easeInOut" }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-[#020202]/90 to-[#020202] z-20 pointer-events-none"
-          />
-
-          {/* Laser-Ignition Line */}
-          <motion.div 
-            initial={{ x: '-100%' }}
-            animate={{ x: '100%' }}
-            transition={{ duration: 4, ease: "easeInOut" }}
-            className="absolute inset-y-0 w-1 bg-cyan-400 blur-[2px] z-30 shadow-[0_0_20px_#22d3ee]"
+            animate={{ opacity: [0, 0.1, 0, 0.2, 0] }}
+            transition={{ duration: 0.1, repeat: Infinity }}
+            className="absolute inset-0 bg-white/5 blur-[1px] pointer-events-none"
           />
         </div>
       </div>
 
-      {/* SYTEM INITIALIZATION HUD */}
+      {/* TACTICAL STATUS HUD */}
       <motion.div 
-        className="absolute bottom-24 flex flex-col items-center gap-5"
+        className="absolute bottom-24 flex flex-col items-center gap-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
+        transition={{ delay: 0.5 }}
       >
-        <div className="flex flex-col items-center gap-1.5">
-           <span className="text-[9px] font-black text-cyan-400 uppercase tracking-[0.8em] ml-[0.8em] animate-pulse">
-               ESTABLECIENDO ENLACE TÁCTICO
-           </span>
-           <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.3em] font-mono">
-               MOD_OS_v4.2.0 // NODE_SYNC
-           </span>
+        <div className="flex flex-col items-center gap-2">
+           <motion.span 
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.6em] ml-[0.6em] italic"
+           >
+               ESTABLECIENDO PROTOCOLOS DE CIUDAD
+           </motion.span>
+           <div className="flex items-center gap-4 text-[7px] font-bold text-white/10 uppercase tracking-[0.4em] font-mono">
+              <span>GPS_SYNC: OK</span>
+              <div className="w-1 h-1 rounded-full bg-white/10" />
+              <span>CRYPT_AUTH: OK</span>
+              <div className="w-1 h-1 rounded-full bg-white/10" />
+              <span>NODES: 256</span>
+           </div>
         </div>
         
-        <div className="h-0.5 w-[240px] bg-white/5 rounded-full overflow-hidden relative border border-white/5">
+        <div className="h-0.5 w-[260px] bg-white/5 rounded-full overflow-hidden relative">
           <motion.div 
             className="h-full bg-cyan-400 shadow-[0_0_20px_#22d3ee]"
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
-            transition={{ duration: 5, ease: "easeInOut" }}
+            transition={{ duration: 5, ease: "linear" }}
           />
         </div>
       </motion.div>
