@@ -113,7 +113,7 @@ export function ReportScreen() {
     }
   };
 
-  const handlePointerUp = async (e: React.PointerEvent) => {
+  const handlePointerUp = async () => {
     if (pressTimer.current) clearTimeout(pressTimer.current);
     if (isPressing && selectedCategory) {
       await submitReport(selectedCategory);
