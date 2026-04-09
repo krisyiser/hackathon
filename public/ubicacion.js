@@ -6,6 +6,8 @@ let incidentesGlobales = []
 let directionsService = null
 let directionsRenderer = null
 let marcadorDestino = null
+let str_reporte_vialidad = ""
+
 
 let lat_global = null
 let lng_global = null
@@ -55,7 +57,25 @@ async function initMap() {
         })
 
         infoWindowMapa = new google.maps.InfoWindow()
-        
+
+        try {
+            monitorearUbicacion()
+            
+            const ubicacion = await pedirUbicacion()
+            const ubicacionActual = { lat: ubicacion.lat, lng: ubicacion.lng }
+
+            map.setCenter(ubicacionActual)
+            actualizarMarcadorUsuario(ubicacionActual)
+        } catch (errorUbicacion) {
+            console.error("Error inicial ubi:", errorUbicacion)
+            mostrarErrorUbicacion(
+                infoWindowMapa,
+                UBICACION_INICIAL,
+                true,
+                errorUbicacion.message || "No se pudo obtener tu ubicación actual."
+            )
+        }
+
         // Inicializar servicios de ruta
         directionsService = new google.maps.DirectionsService()
         directionsRenderer = new google.maps.DirectionsRenderer({
@@ -73,25 +93,6 @@ async function initMap() {
             const destino = e.latLng
             establecerDestino(destino)
         })
-
-        try {
-            // Empezar a monitorear ubicación real continuamente
-            monitorearUbicacion()
-            
-            const ubicacion = await pedirUbicacion()
-            const ubicacionActual = { lat: ubicacion.lat, lng: ubicacion.lng }
-
-            map.setCenter(ubicacionActual)
-            actualizarMarcadorUsuario(ubicacionActual)
-        } catch (errorUbicacion) {
-            console.error("Error inicial ubi:", errorUbicacion)
-            mostrarErrorUbicacion(
-                infoWindowMapa,
-                UBICACION_INICIAL,
-                true,
-                errorUbicacion.message || "No se pudo obtener tu ubicación actual."
-            )
-        }
     } catch (errorMapa) {
         console.error("Error cargando Google Maps:", errorMapa)
     }
@@ -110,56 +111,6 @@ function mostrarErrorUbicacion(infoWindow, posicion, navegadorSoportaGeo, mensaj
         )
     )
     infoWindow.open(map)
-}
-
-function monitorearUbicacion() {
-    if (!("geolocation" in navigator)) return
-
-    navigator.geolocation.watchPosition(
-        pos => {
-            const { latitude, longitude, accuracy } = pos.coords
-            lat_global = latitude
-            lng_global = longitude
-            accuracy_global = accuracy
-            timestamp_global = pos.timestamp
-
-            const posNueva = { lat: latitude, lng: longitude }
-            actualizarMarcadorUsuario(posNueva)
-            
-            // Si es la primera vez o nos movemos mucho, centramos (opcional, mejor dejarlo al usuario)
-            // map.setCenter(posNueva) 
-            
-            enviarCoordenadas()
-        },
-        err => console.error("Error watchPosition:", err),
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        }
-    )
-}
-
-function actualizarMarcadorUsuario(posicion) {
-    if (!map) return
-
-    if (marcadorUsuario) {
-        marcadorUsuario.setPosition(posicion)
-    } else {
-        marcadorUsuario = new google.maps.Marker({
-            map,
-            position: posicion,
-            title: "Tu ubicación actual",
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 7,
-                fillColor: "#32ADE6",
-                fillOpacity: 1,
-                strokeWeight: 2,
-                strokeColor: "#FFFFFF"
-            }
-        })
-    }
 }
 
 function pedirUbicacion(options = {}) {
@@ -244,24 +195,55 @@ function pedirUbicacion(options = {}) {
     })
 }
 
+function monitorearUbicacion() {
+    if (!("geolocation" in navigator)) return
+    navigator.geolocation.watchPosition(
+        pos => {
+            const { latitude, longitude, accuracy } = pos.coords
+            lat_global = latitude
+            lng_global = longitude
+            accuracy_global = accuracy
+            timestamp_global = pos.timestamp
+            const posNueva = { lat: latitude, lng: longitude }
+            actualizarMarcadorUsuario(posNueva)
+            enviarCoordenadas()
+        },
+        err => console.error("Error watchPosition:", err),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
+}
+
+function actualizarMarcadorUsuario(posicion) {
+    if (!map) return
+    if (marcadorUsuario) {
+        marcadorUsuario.setPosition(posicion)
+    } else {
+        marcadorUsuario = new google.maps.Marker({
+            map,
+            position: posicion,
+            title: "Tu ubicación actual",
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 7,
+                fillColor: "#32ADE6",
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: "#FFFFFF"
+            }
+        })
+    }
+}
+
 function enviarCoordenadas() {
-    let check_evidencia = 0
-
-    if (lat_global != null && lat_global !== "") check_evidencia = 1
-    else lat_global = ""
-
-    if (lng_global != null && lng_global !== "") check_evidencia = 1
-    else lng_global = ""
-
-    const formData = new FormData()
-    formData.append("latitud", lat_global)
-    formData.append("longitud", lng_global)
-    formData.append("marcadores", marcadores)
-
     const isDemoMode = localStorage.getItem('motus_demo_mode') === 'true';
     const targetUrl = isDemoMode 
         ? "/demo_reports.json" 
         : "https://lookitag.com/motus/controlador/recibir_ubicacion.php";
+
+    const formData = new FormData()
+    formData.append("latitud", lat_global || "")
+    formData.append("longitud", lng_global || "")
+    formData.append("marcadores", marcadores)
 
     const fetchOptions = isDemoMode ? { method: "GET" } : { method: "POST", body: formData };
 
@@ -269,36 +251,32 @@ function enviarCoordenadas() {
     .then(r => r.ok ? (isDemoMode ? r.json() : r.text()) : Promise.reject("Error en la petición"))
     .then(data => {
         let datos = []
-        
         if (isDemoMode) {
             datos = data
         } else {
-            // Solo aplicar toLowerCase if es un string (respuesta del servidor)
             if (typeof data === "string" && !data.toLowerCase().includes("error")) {
-                try {
-                    datos = JSON.parse(data)
-                } catch(e) {
-                    console.error("Error parseando JSON real:", e)
-                }
+                try { datos = JSON.parse(data) } catch(e) { console.error("Error parseando:", e) }
             } else if (typeof data === "object") {
-                datos = data // Caso de respaldo
+                datos = data
             } else {
-                console.warn("Respuesta backend con error o vacía:", data)
                 return
             }
         }
-
-        console.log("Datos finales para mapa:", datos)
-        incidentesGlobales = datos 
+        incidentesGlobales = datos
         pintarReportesEnMapa(datos)
     })
     .catch(err => console.error("Error:", err))
 }
+
+let resumen_reportes_mapa = ""
 function pintarReportesEnMapa(datos) {
     if (!Array.isArray(datos) || !map) return
 
     limpiarMarcadoresReportesMapa()
 
+    resumen_reportes_mapa = ""
+
+    const textos_reportes = []
     const bounds = new google.maps.LatLngBounds()
     let hayElementos = false
 
@@ -314,27 +292,27 @@ function pintarReportesEnMapa(datos) {
         }
     }
 
-    const tipologiasDemo = ["seguridad", "emergencia", "obstruccion", "saturacion", "entorno"]
-    datos.forEach((objeto, index) => {
+    for (let objeto of datos) {
         const lat = Number(objeto.lat)
         const lng = Number(objeto.lng)
 
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-            return
+            continue
         }
 
         const posicion = { lat, lng }
 
-        let tipo = objeto.tipo || objeto.tipo_alerta || objeto.categoria || ""
-        if (!tipo) {
-            tipo = tipologiasDemo[index % tipologiasDemo.length]
-        }
+        const tipo = objeto.tipo || objeto.tipo_alerta || objeto.categoria || ""
         const colorMarcador = obtenerColorMarcador(tipo)
 
-        const titulo = objeto.titulo || objeto.linea || "Reporte Motus"
-        const descripcion = objeto.descripcion || objeto.description || "Sin descripción disponible"
-        const direccion = objeto.direccion_objeto || objeto.direccion || objeto.metadata?.direccion || "Ubicación táctica"
-        const fecha = objeto.fecha || objeto.created_at || "Sincronizando..."
+        const titulo = objeto.titulo || "Sin título"
+        const descripcion = objeto.descripcion || "Sin descripción"
+        const direccion = objeto.direccion_objeto || objeto.direccion || "Sin dirección"
+        const fecha = objeto.fecha || "Sin fecha"
+
+        if (!(titulo === "Sin título" && descripcion === "Sin descripción")) {
+            textos_reportes.push(titulo + ": " + descripcion)
+        }
 
         const marker = new google.maps.Marker({
             map,
@@ -373,7 +351,11 @@ function pintarReportesEnMapa(datos) {
         marcadoresReportesMapa.push(marker)
         bounds.extend(posicion)
         hayElementos = true
-    })
+    }
+
+    resumen_reportes_mapa = textos_reportes.join("\n")
+
+    console.log(resumen_reportes_mapa)
 
     if (hayElementos) {
         map.fitBounds(bounds)
@@ -387,6 +369,8 @@ function pintarReportesEnMapa(datos) {
         map.setCenter(UBICACION_INICIAL)
         map.setZoom(15)
     }
+
+    reporteVialidad()
 }
 
 function limpiarMarcadoresReportesMapa() {
@@ -446,29 +430,46 @@ function crearIconoMarcador(color) {
     }
 }
 
-function establecerDestino(latLng) {
-    if (marcadorDestino) {
-        marcadorDestino.setPosition(latLng)
-    } else {
-        marcadorDestino = new google.maps.Marker({
-            position: latLng,
-            map: map,
-            icon: {
-                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-            },
-            title: "Destino"
-        })
-    }
+function reporteVialidad() {
+    const formData = new FormData()
+    formData.append("resumen", resumen_reportes_mapa)
 
-    if (lat_global && lng_global) {
-        calcularRuta(
-            { lat: lat_global, lng: lng_global },
-            latLng
-        )
-    }
+    fetch("https://lookitag.com/motus/controlador/reporte_vialidad.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(r => r.ok ? r.text() : Promise.reject("Error en la petición"))
+    .then(body => {
+        if (!body.toLowerCase().includes("error")) {
+            str_reporte_vialidad = body
+            // Actualizar HUD si existe
+            const hud = document.getElementById("hud-vialidad")
+            if (hud) hud.innerHTML = body
+        }
+    })
+    .catch(err => console.error("Error vialidad:", err))
 }
 
-function calcularRuta(origen, destino) {
+function establecerDestino(latLng) {
+    if (marcadorDestino) marcadorDestino.setMap(null)
+    marcadorDestino = new google.maps.Marker({
+        position: latLng,
+        map,
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: "#F21314",
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: "#FFFFFF"
+        }
+    })
+    calcularRuta(latLng)
+}
+
+function calcularRuta(destino) {
+    if (!lat_global || !lng_global) return
+    const origen = new google.maps.LatLng(lat_global, lng_global)
     const request = {
         origin: origen,
         destination: destino,
@@ -478,62 +479,33 @@ function calcularRuta(origen, destino) {
 
     directionsService.route(request, (result, status) => {
         if (status === google.maps.DirectionsStatus.OK) {
-            
-            // BUSCAR UNA RUTA QUE EVITE INCIDENTES
             let mejorRuta = result.routes[0]
-            let hayRutaLimpia = false
+            let tieneConflicto = detectarConflictoEnRuta(mejorRuta)
 
-            for (let i = 0; i < result.routes.length; i++) {
-                const rutaActual = result.routes[i]
-                if (!detectarConflictoEnRuta(rutaActual)) {
-                    mejorRuta = rutaActual
-                    hayRutaLimpia = true
-                    break
+            if (tieneConflicto && result.routes.length > 1) {
+                for (let i = 1; i < result.routes.length; i++) {
+                    if (!detectarConflictoEnRuta(result.routes[i])) {
+                        mejorRuta = result.routes[i]
+                        tieneConflicto = false
+                        break
+                    }
                 }
             }
 
-            // Aplicar la mejor opción encontrada
-            const temporalResult = { ...result, routes: [mejorRuta] }
-            directionsRenderer.setDirections(temporalResult)
-            
-            const route = mejorRuta.legs[0]
-            
-            let statusText = hayRutaLimpia 
-                ? '<strong style="color:#02D701;">RUTA SEGURA OPTIMIZADA</strong>' 
-                : '<strong style="color:#FF6B00;">RUTA DIRECTA (PRECAUCIÓN INCIDENTES)</strong>'
-
-            infoWindowMapa.setContent(`
-                <div style="padding:10px; font-family:sans-serif;">
-                    ${statusText}
-                    <div style="font-size:12px; color:#444; margin-top:5px;">
-                        Distancia: <b>${route.distance.text}</b><br>
-                        Tiempo: <b>${route.duration.text}</b>
-                    </div>
-                    ${!hayRutaLimpia ? '<div style="font-size:9px; color:red; margin-top:5px;">Aviso: No se encontraron rutas alternativas sin incidentes.</div>' : ''}
-                </div>
-            `)
-            infoWindowMapa.open(map, marcadorDestino)
-        } else {
-            console.error("No se pudo calcular la ruta:", status)
+            directionsRenderer.setDirections(result)
+            directionsRenderer.setRouteIndex(result.routes.indexOf(mejorRuta))
         }
     })
 }
 
 function detectarConflictoEnRuta(ruta) {
     if (!incidentesGlobales || incidentesGlobales.length === 0) return false
-
-    const RADIUS_UMBRAL = 150 // metros para considerar que "pasa por" el incidente
     const path = ruta.overview_path
-
     for (let incidente of incidentesGlobales) {
-        const posIncidente = new google.maps.LatLng(Number(incidente.lat), Number(incidente.lng))
-        
-        for (let punto of path) {
-            const distancia = google.maps.geometry.spherical.computeDistanceBetween(punto, posIncidente)
-            if (distancia < RADIUS_UMBRAL) {
-                console.warn("Conflicto detectado con incidente:", incidente.titulo)
-                return true 
-            }
+        const ubiIncidente = new google.maps.LatLng(Number(incidente.lat), Number(incidente.lng))
+        for (let point of path) {
+            const distancia = google.maps.geometry.spherical.computeDistanceBetween(point, ubiIncidente)
+            if (distancia < 150) return true
         }
     }
     return false
