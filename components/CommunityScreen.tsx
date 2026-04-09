@@ -109,7 +109,7 @@ export function CommunityScreen() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-black pt-24 sm:pt-28 pb-48 no-scrollbar relative font-sans">
+    <div className="flex-1 overflow-y-auto bg-black pt-32 sm:pt-40 pb-48 no-scrollbar relative font-sans">
       
       {/* Header (Responsive Minimal) */}
       <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/5 px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between">
@@ -177,7 +177,7 @@ export function CommunityScreen() {
                   <span className="text-white/20 text-[10px] sm:text-sm font-bold">{post.created_at}</span>
                 </div>
 
-                <p className="text-base sm:text-[19px] text-white/90 leading-relaxed mb-4 sm:mb-6 font-medium whitespace-pre-wrap">
+                <p className="text-base sm:text-[19px] text-white/90 leading-relaxed mb-4 sm:mb-6 font-medium whitespace-pre-wrap break-words">
                   {post.content}
                 </p>
 

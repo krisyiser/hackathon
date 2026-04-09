@@ -36,7 +36,7 @@ export default function Home() {
   };
 
   return (
-    <main className={`relative h-screen w-full flex flex-col theme-${theme} transition-all duration-700 bg-black`}>
+    <main className={`relative h-[100dvh] w-full flex flex-col theme-${theme} transition-all duration-700 bg-black overflow-hidden`}>
       <AnimatePresence mode="wait">
         
         {/* State 1: Splash */}

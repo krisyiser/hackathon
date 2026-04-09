@@ -121,12 +121,12 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 pt-40 pb-48 no-scrollbar bg-transparent relative">
+    <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-32 sm:pt-40 pb-48 no-scrollbar bg-transparent relative">
       
       {/* Reversible Identity Card Container */}
       <div className="mb-28 perspective-1000 relative z-10">
         <motion.div 
-          className="relative w-full h-[540px] preserve-3d cursor-pointer"
+          className="relative w-full h-[400px] sm:h-[540px] preserve-3d cursor-pointer"
           animate={{ 
             rotateY: isFlipped ? 180 : 0,
             z: isFlipped ? 50 : 0 
@@ -138,7 +138,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
           style={{ zIndex: isFlipped ? 50 : 10 }}
         >
           {/* FRONT */}
-          <div className="absolute inset-0 backface-hidden glass-card-premium rounded-[54px] p-10 flex flex-col items-center justify-center border-white/20 shadow-2xl z-20 overflow-hidden">
+          <div className="absolute inset-0 backface-hidden glass-card-premium rounded-[48px] sm:rounded-[54px] p-6 sm:p-10 flex flex-col items-center justify-center border-white/20 shadow-2xl z-20 overflow-hidden">
             <div className="relative mb-10">
                <div className="absolute -inset-8 bg-gradient-to-tr from-cyan-500/30 to-rose-500/30 rounded-full blur-3xl animate-pulse" />
                <div className="relative w-48 h-48 rounded-[64px] glass-premium p-4 border-white/20">
@@ -167,7 +167,7 @@ export function ConfigScreen({ onThemeChange }: { onThemeChange: (theme: string)
 
           {/* BACK */}
           <div 
-            className="absolute inset-0 backface-hidden glass-card-premium rounded-[54px] p-10 flex flex-col justify-between border-white/20 shadow-2xl bg-black/80"
+            className="absolute inset-0 backface-hidden glass-card-premium rounded-[48px] sm:rounded-[54px] p-6 sm:p-10 flex flex-col justify-between border-white/20 shadow-2xl bg-black/80"
             style={{ transform: 'rotateY(180deg)' }}
           >
             <div className="h-full flex flex-col">
