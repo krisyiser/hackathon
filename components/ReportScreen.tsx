@@ -354,7 +354,7 @@ export function ReportScreen() {
                       value={formData.titulo}
                       onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
                       placeholder={formData.titulo ? "" : "Identifique el incidente..."} 
-                      className="w-full bg-black/50 rounded-[28px] px-6 py-5 text-lg text-white placeholder:text-white/60 outline-none font-bold italic"
+                      className="w-full bg-black/50 rounded-[28px] px-6 py-6 text-xl text-white placeholder:text-white/40 outline-none font-bold italic tracking-tight"
                     />
                   </div>
                 </div>
@@ -370,7 +370,7 @@ export function ReportScreen() {
                       onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
                       placeholder={formData.descripcion ? "" : "Relate los hechos observados..."} 
                       rows={5}
-                      className="w-full bg-black/50 rounded-[28px] px-6 py-5 text-white placeholder:text-white/60 outline-none font-medium resize-none leading-relaxed"
+                      className="w-full bg-black/50 rounded-[28px] px-6 py-6 text-lg text-white placeholder:text-white/40 outline-none font-bold italic resize-none leading-[1.6]"
                     />
                   </div>
                 </div>
