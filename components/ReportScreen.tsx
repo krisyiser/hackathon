@@ -10,7 +10,11 @@ import {
   Check, 
   Zap,
   Activity,
-  Plus
+  Plus,
+  Camera,
+  X,
+  Send,
+  FileText
 } from 'lucide-react';
 import { IncidentType } from '@/types';
 import { useVoiceReport } from '@/hooks/useVoiceReport';
@@ -25,6 +29,7 @@ export function ReportScreen() {
   const [isPressing, setIsPressing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<IncidentType | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [ripples, setRipples] = useState<{ id: string; x: number; y: number; delay: number }[]>([]);
   const { startListening, stopListening, isListening } = useVoiceReport();
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -32,6 +37,15 @@ export function ReportScreen() {
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonCenterRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Form States
+  const [formData, setFormData] = useState({
+    tipo: 'entorno' as IncidentType,
+    titulo: '',
+    descripcion: '',
+    foto: null as File | null,
+    fotoPreview: null as string | null
+  });
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 640);
@@ -110,33 +124,43 @@ export function ReportScreen() {
   const handlePointerUp = async () => {
     if (pressTimer.current) clearTimeout(pressTimer.current);
     if (isPressing && selectedCategory) {
-      await submitReport(selectedCategory);
+      await submitReport({ tipo: selectedCategory, titulo: '', descripcion: '' });
     }
     setIsPressing(false);
     setSelectedCategory(null);
     buttonCenterRef.current = null;
   };
 
-  const submitReport = async (type: IncidentType) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({ 
+        ...prev, 
+        foto: file, 
+        fotoPreview: URL.createObjectURL(file) 
+      }));
+    }
+  };
+
+  const submitReport = async (data: { tipo: IncidentType, titulo: string, descripcion: string, foto?: File | null }) => {
     const win = window as unknown as { lat_global?: number; lng_global?: number; };
-    const reportData = {
-      latitud: win.lat_global || 19.4326,
-      longitud: win.lng_global || -99.1332,
-      tipo: type
-    };
+    const latitud = win.lat_global || 19.4326;
+    const longitud = win.lng_global || -99.1332;
 
     setShowSuccess(true);
     if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
     setIsPressing(false);
     setSelectedCategory(null);
+    setIsFormOpen(false);
 
     try {
       const fd = new FormData();
-      fd.append("latitud", reportData.latitud.toString());
-      fd.append("longitud", reportData.longitud.toString());
-      fd.append("tipo", reportData.tipo);
-      fd.append("titulo", "");
-      fd.append("descripcion", "");
+      fd.append("latitud", latitud.toString());
+      fd.append("longitud", longitud.toString());
+      fd.append("tipo", data.tipo);
+      fd.append("titulo", data.titulo);
+      fd.append("descripcion", data.descripcion);
+      if (data.foto) fd.append("foto", data.foto);
       
       const response = await fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
         method: "POST", 
@@ -145,14 +169,8 @@ export function ReportScreen() {
 
       const responseText = await response.text();
       console.log("📡 Respuesta bruta del servidor:", responseText);
-
-      if (response.ok) {
-        console.log("✅ Reporte procesado correctamente.");
-      } else {
-        console.error("❌ Error de servidor:", response.status, responseText);
-      }
     } catch (e) {
-      console.warn("⚠️ Error de conexión con el endpoint central:", e);
+      console.warn("⚠️ Error de conexión:", e);
     }
 
     setTimeout(() => setShowSuccess(false), 2500);
@@ -169,7 +187,16 @@ export function ReportScreen() {
           </motion.div>
           <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.9] break-words">Emisión<br/><span className="text-white/20">de Alerta.</span></h3>
         </div>
-        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl glass-premium flex items-center justify-center border-white/10 shadow-2xl shrink-0"><Zap className="w-7 h-7 sm:w-10 sm:h-10 text-rose-500 animate-pulse" strokeWidth={3} /></div>
+        
+        {/* BOTÓN FULL REPORT */}
+        <button 
+          onClick={() => setIsFormOpen(true)}
+          className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl glass-premium flex items-center justify-center border-white/10 shadow-2xl shrink-0 active:scale-90 transition-transform group relative overflow-hidden"
+        >
+          <Zap className="w-7 h-7 sm:w-10 sm:h-10 text-rose-500 animate-pulse relative z-10" strokeWidth={3} />
+          <div className="absolute inset-0 bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-ping" />
+        </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center relative w-full h-full">
@@ -184,7 +211,6 @@ export function ReportScreen() {
         <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10 no-select">
           <div className={cn("absolute inset-0 rounded-full blur-3xl transition-all duration-1000", isListening ? "bg-rose-500/20 scale-125" : "bg-white/5 opacity-10 scale-110")} />
           
-          {/* Categorías Radiales - Siempre montadas para evitar parpadeo */}
           {categories.map((cat) => (
             <motion.div
               key={cat.id}
@@ -236,6 +262,104 @@ export function ReportScreen() {
           </div>
         </div>
       </div>
+
+      {/* FULL REPORT MODAL */}
+      <AnimatePresence>
+        {isFormOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[500] bg-black/90 backdrop-blur-2xl flex flex-col p-6 no-scrollbar overflow-y-auto"
+          >
+            <div className="flex items-center justify-between mb-10 pt-4">
+              <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase">Reporte Detallado</h4>
+              <button onClick={() => setIsFormOpen(false)} className="w-12 h-12 rounded-full glass-premium flex items-center justify-center border-white/10 active:scale-90"><X className="text-white" /></button>
+            </div>
+
+            <div className="space-y-8 flex-1">
+              {/* TIPO SELECTOR */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Categoría del Incidente</label>
+                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setFormData(prev => ({ ...prev, tipo: cat.id }))}
+                      className={cn(
+                        "flex-shrink-0 w-20 h-20 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all border",
+                        formData.tipo === cat.id ? "bg-white/10 border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.1)]" : "bg-white/5 border-white/5 opacity-40"
+                      )}
+                    >
+                      <cat.icon className="w-6 h-6" style={{ color: formData.tipo === cat.id ? cat.color : '#fff' }} />
+                      <span className="text-[8px] font-bold tracking-tight">{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* TITULO */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Título del Reporte</label>
+                <div className="rounded-3xl glass-premium p-1 border border-white/10 focus-within:border-cyan-500/50 transition-colors">
+                  <input 
+                    type="text" 
+                    value={formData.titulo}
+                    onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
+                    placeholder="Ej. Bache profundo en Av. Loreto" 
+                    className="w-full bg-transparent px-6 py-5 text-white placeholder:text-white/10 outline-none font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* DESCRIPCION */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Descripción Detallada</label>
+                <div className="rounded-3xl glass-premium p-1 border border-white/10 focus-within:border-cyan-500/50 transition-colors">
+                  <textarea 
+                    value={formData.descripcion}
+                    onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
+                    placeholder="Describe los detalles de lo que está sucediendo..." 
+                    rows={4}
+                    className="w-full bg-transparent px-6 py-5 text-white placeholder:text-white/10 outline-none font-medium resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* FOTO */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Evidencia Fotográfica</label>
+                <div className="flex gap-4 items-center">
+                  <label className="flex-1 h-32 rounded-3xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 hover:bg-white/5 cursor-pointer transition-all active:scale-[0.98]">
+                    {formData.fotoPreview ? (
+                      <img src={formData.fotoPreview} className="w-full h-full object-cover rounded-3xl" alt="Preview" />
+                    ) : (
+                      <>
+                        <Camera className="w-8 h-8 text-white/20" />
+                        <span className="text-[10px] font-black text-white/20">TOMAR FOTO O SUBIR</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
+                  </label>
+                  {formData.foto && (
+                    <button onClick={() => setFormData(p => ({ ...p, foto: null, fotoPreview: null }))} className="w-12 h-12 rounded-full glass-premium border-white/10 flex items-center justify-center text-rose-500 active:scale-90"><X /></button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 pb-10">
+              <button 
+                onClick={() => submitReport(formData)}
+                className="w-full py-6 bg-white text-black font-black uppercase tracking-[0.3em] rounded-[32px] shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3"
+              >
+                <Send className="w-5 h-5" /> Enviar Reporte Táctico
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <style jsx global>{`
         .no-select {
           -webkit-user-select: none !important;
