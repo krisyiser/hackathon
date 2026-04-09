@@ -117,7 +117,7 @@ export function ReportScreen() {
     buttonCenterRef.current = null;
   };
 
-  const submitReport = async (type: IncidentType, description?: string) => {
+  const submitReport = async (type: IncidentType) => {
     const win = window as unknown as { lat_global?: number; lng_global?: number; };
     const reportData = {
       lat: win.lat_global || 19.4326,
