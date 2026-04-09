@@ -141,10 +141,13 @@ export function ReportScreen() {
         body: fd
       });
 
+      const responseText = await response.text();
+      console.log("📡 Respuesta bruta del servidor:", responseText);
+
       if (response.ok) {
-        console.log("✅ Reporte recibido por el servidor central.");
+        console.log("✅ Reporte procesado correctamente.");
       } else {
-        console.error("❌ Fallo en el servidor central:", response.status);
+        console.error("❌ Error de servidor:", response.status, responseText);
       }
     } catch (e) {
       console.warn("⚠️ Error de conexión con el endpoint central:", e);
