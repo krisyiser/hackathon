@@ -163,7 +163,7 @@ export function IncidentsScreen() {
                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-50" />
                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-50" />
                   </div>
-                  <span className="text-[10px] font-bold font-mono text-white/20 tracking-[0.3em] uppercase">{selectedIncident.id.toString().slice(-6).toUpperCase()}</span>
+                  <span className="text-[10px] font-bold font-mono text-white/20 tracking-[0.3em] uppercase italic">Detalle de Alerta</span>
                   <button onClick={() => setSelectedIncident(null)} className="text-white/40 hover:text-white transition-colors bg-white/5 p-2 rounded-xl border border-white/10">
                      <X className="w-6 h-6" />
                   </button>
