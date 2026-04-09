@@ -51,17 +51,13 @@ export function ReportScreen() {
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     
-    // Calcular centro del botón para lógica matemática
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     buttonCenterRef.current = {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2
     };
 
-    const centerX = e.clientX;
-    const centerY = e.clientY;
-    
-    setRipples(prev => [...prev, { id: Date.now().toString(), x: centerX, y: centerY, delay: 0 }]);
+    setRipples(prev => [...prev, { id: Date.now().toString(), x: e.clientX, y: e.clientY, delay: 0 }]);
 
     const now = Date.now();
     if (now - lastTapTime.current < 300) {
@@ -85,7 +81,6 @@ export function ReportScreen() {
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-    // Si el dedo está lo suficientemente alejado del centro (zona de categorías)
     if (distance > 60) {
       let closest = categories[0];
       let minDiff = 360;
@@ -99,7 +94,6 @@ export function ReportScreen() {
         }
       });
 
-      // Umbral de precisión: si el dedo está cerca del ángulo de una categoría
       if (minDiff < 45) {
         if (selectedCategory !== closest.id) {
           setSelectedCategory(closest.id);
@@ -142,14 +136,14 @@ export function ReportScreen() {
       Object.entries(reportData).forEach(([k,v]) => fd.append(k, v.toString()));
       fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
         method: "POST", body: fd, mode: 'no-cors' 
-      }).catch(e => console.warn("Background send error", e));
+      });
     } catch {}
 
     setTimeout(() => setShowSuccess(false), 2500);
   };
 
   return (
-    <div className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative" ref={containerRef}>
+    <div className="flex-1 flex flex-col px-4 sm:px-6 pt-32 sm:pt-40 pb-48 bg-black select-none touch-none overflow-hidden relative report-screen-container" ref={containerRef}>
       
       <div className="w-full mb-8 sm:mb-20 px-2 flex items-end justify-between shrink-0 relative z-20">
         <div className="flex-1 min-w-0 pr-4">
@@ -163,7 +157,6 @@ export function ReportScreen() {
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center relative w-full h-full">
-        {/* Ripples */}
         <div className="absolute inset-0 pointer-events-none z-0">
           <AnimatePresence>
             {ripples.map(r => (
@@ -172,37 +165,34 @@ export function ReportScreen() {
           </AnimatePresence>
         </div>
 
-        <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10">
+        <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex flex-col items-center justify-center z-10 no-select">
           <div className={cn("absolute inset-0 rounded-full blur-3xl transition-all duration-1000", isListening ? "bg-rose-500/20 scale-125" : "bg-white/5 opacity-10 scale-110")} />
           
-          {/* Categorías Radiales */}
-          <AnimatePresence>
-            {isPressing && categories.map((cat) => (
-              <motion.div
-                key={cat.id}
-                initial={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
-                animate={{ 
-                  scale: selectedCategory === cat.id ? 1.4 : 1, 
-                  opacity: 1, filter: 'blur(0px)',
-                  x: Math.cos(cat.angle * (Math.PI / 180)) * d,
-                  y: Math.sin(cat.angle * (Math.PI / 180)) * d
-                }}
-                exit={{ scale: 0, opacity: 0, filter: 'blur(10px)' }}
-                className={cn(
-                  "absolute w-16 h-16 rounded-full glass-premium flex items-center justify-center border-white/10 transition-all duration-200",
-                  selectedCategory === cat.id ? "border-white/60 bg-white/20" : "opacity-40"
-                )}
-                style={{ boxShadow: selectedCategory === cat.id ? `0 0 30px ${cat.color}66` : 'none' }}
-              >
-                 <div className="w-full h-full rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: selectedCategory === cat.id ? cat.color : 'rgba(255,255,255,0.05)', color: selectedCategory === cat.id ? '#000' : 'rgba(255,255,255,0.4)' }}>
-                    <cat.icon className="w-7 h-7" strokeWidth={3} />
-                 </div>
-                 {selectedCategory === cat.id && (
-                   <motion.span initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="absolute -bottom-10 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ color: cat.color }}>{cat.label}</motion.span>
-                 )}
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {/* Categorías Radiales - Siempre montadas para evitar parpadeo */}
+          {categories.map((cat) => (
+            <motion.div
+              key={cat.id}
+              animate={{ 
+                scale: isPressing ? (selectedCategory === cat.id ? 1.4 : 1) : 0, 
+                opacity: isPressing ? (selectedCategory === cat.id ? 1 : 0.4) : 0,
+                x: isPressing ? Math.cos(cat.angle * (Math.PI / 180)) * d : 0,
+                y: isPressing ? Math.sin(cat.angle * (Math.PI / 180)) * d : 0
+              }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300, mass: 0.5 }}
+              className={cn(
+                "absolute w-16 h-16 rounded-full glass-premium flex items-center justify-center border-white/10 pointer-events-none",
+                selectedCategory === cat.id && "border-white/60 bg-white/20"
+              )}
+              style={{ boxShadow: selectedCategory === cat.id ? `0 0 30px ${cat.color}66` : 'none' }}
+            >
+               <div className="w-full h-full rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: selectedCategory === cat.id ? cat.color : 'rgba(255,255,255,0.05)', color: selectedCategory === cat.id ? '#000' : 'rgba(255,255,255,0.4)' }}>
+                  <cat.icon className="w-7 h-7" strokeWidth={3} />
+               </div>
+               {selectedCategory === cat.id && (
+                 <span className="absolute -bottom-10 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ color: cat.color }}>{cat.label}</span>
+               )}
+            </motion.div>
+          ))}
 
           <button
             onPointerDown={handlePointerDown}
@@ -210,7 +200,7 @@ export function ReportScreen() {
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
             className={cn(
-              "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-500 flex items-center justify-center overflow-hidden active:scale-95 group select-none touch-none",
+              "relative z-10 w-44 h-44 sm:w-56 sm:h-56 rounded-[56px] sm:rounded-[80px] transition-all duration-500 flex items-center justify-center overflow-hidden active:scale-95 group no-select touch-none",
               isPressing ? "bg-white/20 scale-[0.8] shadow-[0_0_100px_rgba(255,255,255,0.2)]" : "glass-premium hover:bg-white/5",
               isListening && "border-rose-500 shadow-[0_0_60px_rgba(242,19,20,0.5)]"
             )}
@@ -225,15 +215,24 @@ export function ReportScreen() {
             <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[scan_3s_linear_infinite]" />
           </button>
           
-          <AnimatePresence>
-            {!isPressing && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="absolute -bottom-24 z-10 text-[11px] font-black uppercase tracking-[0.4em] text-white opacity-40 text-center whitespace-pre-wrap leading-relaxed select-none">
-                {isListening ? "Transmisión Activa..." : "PULSA: Dial de Reporte\nDOBLE: Reporte por Voz"}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className={cn("absolute -bottom-24 z-10 text-[11px] font-black uppercase tracking-[0.4em] text-white transition-opacity duration-300 text-center whitespace-pre-wrap leading-relaxed no-select", isPressing ? "opacity-0" : "opacity-40")}>
+            {isListening ? "Transmisión Activa..." : "PULSA: Dial de Reporte\nDOBLE: Reporte por Voz"}
+          </div>
         </div>
       </div>
+      <style jsx global>{`
+        .no-select {
+          -webkit-user-select: none !important;
+          -moz-user-select: none !important;
+          -ms-user-select: none !important;
+          user-select: none !important;
+          -webkit-touch-callout: none !important;
+        }
+        .report-screen-container {
+          touch-action: none !important;
+          -webkit-tap-highlight-color: transparent;
+        }
+      `}</style>
     </div>
   );
 }
