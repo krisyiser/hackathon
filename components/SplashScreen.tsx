@@ -38,29 +38,15 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         />
       </div>
 
-      {/* THE LOGO ENGINE (Flickering Sign) */}
-      <div className="relative w-[300px] sm:w-[450px] flex items-center justify-center px-10">
-        
-        {/* Glow halo behind the sign */}
-        <motion.div
-          animate={{ 
-            opacity: isFinished ? 0.6 : [0, 0.2, 0.05, 0.4, 0.1, 0.5, 0.2, 0.8],
-          }}
-          transition={{ 
-            duration: 3, 
-            times: [0, 0.1, 0.15, 0.2, 0.25, 0.35, 0.4, 1],
-            repeat: Infinity,
-            repeatDelay: 5
-          }}
-          className="absolute inset-0 bg-cyan-400/20 blur-[80px] rounded-full"
-        />
-
-        <div className="relative z-10 w-full h-auto">
-          {/* THE LOGO PNG */}
-          <motion.img 
-            src="/motus.png"
-            alt="MOTUS OFFICIAL"
-            className="w-full h-auto object-contain"
+        {/* THE LOGO ENGINE (Flickering Sign) */}
+        <div className="relative w-full max-w-[320px] sm:max-w-[500px] flex items-center justify-center px-4 sm:px-10">
+          
+          <div className="relative z-10 w-full flex items-center justify-center min-h-[140px] sm:min-h-[200px]">
+            {/* THE LOGO PNG */}
+            <motion.img 
+              src="/motus.png"
+              alt="MOTUS OFFICIAL"
+              className="w-full h-auto max-h-[25vh] object-contain"
             initial={{ opacity: 0.05, filter: 'brightness(0.3) grayscale(0.2)' }}
             animate={{ 
                 opacity: isFinished ? 1 : [0.05, 0.1, 0.8, 0.1, 1, 0.3, 1, 0.5, 1],

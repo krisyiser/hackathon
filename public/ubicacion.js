@@ -75,25 +75,16 @@ async function initMap() {
         })
 
         try {
+            // Empezar a monitorear ubicación real continuamente
+            monitorearUbicacion()
+            
             const ubicacion = await pedirUbicacion()
-
-            const ubicacionActual = {
-                lat: ubicacion.lat,
-                lng: ubicacion.lng
-            }
+            const ubicacionActual = { lat: ubicacion.lat, lng: ubicacion.lng }
 
             map.setCenter(ubicacionActual)
-
-            marcadorUsuario = new google.maps.Marker({
-                map,
-                position: ubicacionActual,
-                title: "Tu ubicación actual"
-            })
-
-            infoWindowMapa.setPosition(ubicacionActual)
-            infoWindowMapa.setContent("Tu ubicación actual")
-            infoWindowMapa.open(map, marcadorUsuario)
+            actualizarMarcadorUsuario(ubicacionActual)
         } catch (errorUbicacion) {
+            console.error("Error inicial ubi:", errorUbicacion)
             mostrarErrorUbicacion(
                 infoWindowMapa,
                 UBICACION_INICIAL,
@@ -119,6 +110,56 @@ function mostrarErrorUbicacion(infoWindow, posicion, navegadorSoportaGeo, mensaj
         )
     )
     infoWindow.open(map)
+}
+
+function monitorearUbicacion() {
+    if (!("geolocation" in navigator)) return
+
+    navigator.geolocation.watchPosition(
+        pos => {
+            const { latitude, longitude, accuracy } = pos.coords
+            lat_global = latitude
+            lng_global = longitude
+            accuracy_global = accuracy
+            timestamp_global = pos.timestamp
+
+            const posNueva = { lat: latitude, lng: longitude }
+            actualizarMarcadorUsuario(posNueva)
+            
+            // Si es la primera vez o nos movemos mucho, centramos (opcional, mejor dejarlo al usuario)
+            // map.setCenter(posNueva) 
+            
+            enviarCoordenadas()
+        },
+        err => console.error("Error watchPosition:", err),
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    )
+}
+
+function actualizarMarcadorUsuario(posicion) {
+    if (!map) return
+
+    if (marcadorUsuario) {
+        marcadorUsuario.setPosition(posicion)
+    } else {
+        marcadorUsuario = new google.maps.Marker({
+            map,
+            position: posicion,
+            title: "Tu ubicación actual",
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 7,
+                fillColor: "#32ADE6",
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: "#FFFFFF"
+            }
+        })
+    }
 }
 
 function pedirUbicacion(options = {}) {
@@ -225,26 +266,28 @@ function enviarCoordenadas() {
     const fetchOptions = isDemoMode ? { method: "GET" } : { method: "POST", body: formData };
 
     fetch(targetUrl, fetchOptions)
-    .then(r => r.ok ? r.text() : Promise.reject("Error en la petición"))
-    .then(body => {
-        console.log("Respuesta backend:", body)
-
-        if (!body.toLowerCase().includes("error")) {
-            let datos = JSON.parse(body)
-
-            console.log("Datos parseados:", datos)
-            console.log("Mapa:", map)
-
-            for (let objeto of datos) {
-                console.log("Objeto:", objeto)
-            }
-
-            incidentesGlobales = datos // Guardar para el motor de rutas
-            pintarReportesEnMapa(datos)
+    .then(r => r.ok ? (isDemoMode ? r.json() : r.text()) : Promise.reject("Error en la petición"))
+    .then(data => {
+        let datos = []
+        
+        if (isDemoMode) {
+            datos = data
         } else {
-            console.log("Respuesta con error")
-            console.log(body)
+            if (data && !data.toLowerCase().includes("error")) {
+                try {
+                    datos = JSON.parse(data)
+                } catch(e) {
+                    console.error("Error parseando JSON real:", e)
+                }
+            } else {
+                console.warn("Respuesta backend con error o vacía:", data)
+                return
+            }
         }
+
+        console.log("Datos finales para mapa:", datos)
+        incidentesGlobales = datos 
+        pintarReportesEnMapa(datos)
     })
     .catch(err => console.error("Error:", err))
 }
