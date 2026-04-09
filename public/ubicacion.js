@@ -273,12 +273,15 @@ function enviarCoordenadas() {
         if (isDemoMode) {
             datos = data
         } else {
-            if (data && !data.toLowerCase().includes("error")) {
+            // Solo aplicar toLowerCase if es un string (respuesta del servidor)
+            if (typeof data === "string" && !data.toLowerCase().includes("error")) {
                 try {
                     datos = JSON.parse(data)
                 } catch(e) {
                     console.error("Error parseando JSON real:", e)
                 }
+            } else if (typeof data === "object") {
+                datos = data // Caso de respaldo
             } else {
                 console.warn("Respuesta backend con error o vacía:", data)
                 return
@@ -328,10 +331,10 @@ function pintarReportesEnMapa(datos) {
         }
         const colorMarcador = obtenerColorMarcador(tipo)
 
-        const titulo = objeto.titulo || "Sin título"
-        const descripcion = objeto.descripcion || "Sin descripción"
-        const direccion = objeto.direccion_objeto || objeto.direccion || "Sin dirección"
-        const fecha = objeto.fecha || "Sin fecha"
+        const titulo = objeto.titulo || objeto.linea || "Reporte Motus"
+        const descripcion = objeto.descripcion || objeto.description || "Sin descripción disponible"
+        const direccion = objeto.direccion_objeto || objeto.direccion || objeto.metadata?.direccion || "Ubicación táctica"
+        const fecha = objeto.fecha || objeto.created_at || "Sincronizando..."
 
         const marker = new google.maps.Marker({
             map,
