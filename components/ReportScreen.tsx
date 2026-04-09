@@ -134,10 +134,20 @@ export function ReportScreen() {
     try {
       const fd = new FormData();
       Object.entries(reportData).forEach(([k,v]) => fd.append(k, v.toString()));
-      fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
-        method: "POST", body: fd, mode: 'no-cors' 
+      
+      const response = await fetch("https://lookitag.com/motus/controlador/recibir_reporte.php", { 
+        method: "POST", 
+        body: fd
       });
-    } catch {}
+
+      if (response.ok) {
+        console.log("✅ Reporte recibido por el servidor central.");
+      } else {
+        console.error("❌ Fallo en el servidor central:", response.status);
+      }
+    } catch (e) {
+      console.warn("⚠️ Error de conexión con el endpoint central:", e);
+    }
 
     setTimeout(() => setShowSuccess(false), 2500);
   };
