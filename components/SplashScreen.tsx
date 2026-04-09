@@ -39,14 +39,14 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
       </div>
 
         {/* THE LOGO ENGINE (Flickering Sign) */}
-        <div className="relative w-full max-w-[320px] sm:max-w-[500px] flex items-center justify-center px-4 sm:px-10">
+        <div className="relative w-full max-w-[300px] sm:max-w-[480px] flex items-center justify-center">
           
-          <div className="relative z-10 w-full flex items-center justify-center min-h-[140px] sm:min-h-[200px]">
+          <div className="relative z-10 w-full flex items-center justify-center p-8 sm:p-12">
             {/* THE LOGO PNG */}
             <motion.img 
               src="/motus.png"
               alt="MOTUS OFFICIAL"
-              className="w-full h-auto max-h-[25vh] object-contain"
+              className="w-full h-auto object-contain pointer-events-none"
             initial={{ opacity: 0.05, filter: 'brightness(0.3) grayscale(0.2)' }}
             animate={{ 
                 opacity: isFinished ? 1 : [0.05, 0.1, 0.8, 0.1, 1, 0.3, 1, 0.5, 1],
