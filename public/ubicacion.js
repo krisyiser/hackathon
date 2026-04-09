@@ -2,6 +2,7 @@ let map = null
 let infoWindowMapa = null
 let marcadorUsuario = null
 let marcadoresReportesMapa = []
+let incidentesGlobales = []
 let directionsService = null
 let directionsRenderer = null
 let marcadorDestino = null
@@ -32,7 +33,7 @@ function cargarGoogleMaps() {
         }
 
         const script = document.createElement("script")
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&v=weekly`
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&v=weekly&libraries=geometry`
         script.async = true
         script.defer = true
         script.setAttribute("data-google-maps", "1")
@@ -234,6 +235,7 @@ function enviarCoordenadas() {
                 console.log("Objeto:", objeto)
             }
 
+            incidentesGlobales = datos // Guardar para el motor de rutas
             pintarReportesEnMapa(datos)
         } else {
             console.log("Respuesta con error")
@@ -416,24 +418,44 @@ function calcularRuta(origen, destino) {
     const request = {
         origin: origen,
         destination: destino,
-        travelMode: google.maps.TravelMode.DRIVING
+        travelMode: google.maps.TravelMode.DRIVING,
+        provideRouteAlternatives: true
     }
 
     directionsService.route(request, (result, status) => {
         if (status === google.maps.DirectionsStatus.OK) {
-            directionsRenderer.setDirections(result)
             
-            // Mostrar info de tiempo/distancia
-            const route = result.routes[0].legs[0]
-            console.log(`Ruta óptima calculada: ${route.distance.text}, ${route.duration.text}`)
+            // BUSCAR UNA RUTA QUE EVITE INCIDENTES
+            let mejorRuta = result.routes[0]
+            let hayRutaLimpia = false
+
+            for (let i = 0; i < result.routes.length; i++) {
+                const rutaActual = result.routes[i]
+                if (!detectarConflictoEnRuta(rutaActual)) {
+                    mejorRuta = rutaActual
+                    hayRutaLimpia = true
+                    break
+                }
+            }
+
+            // Aplicar la mejor opción encontrada
+            const temporalResult = { ...result, routes: [mejorRuta] }
+            directionsRenderer.setDirections(temporalResult)
             
+            const route = mejorRuta.legs[0]
+            
+            let statusText = hayRutaLimpia 
+                ? '<strong style="color:#02D701;">RUTA SEGURA OPTIMIZADA</strong>' 
+                : '<strong style="color:#FF6B00;">RUTA DIRECTA (PRECAUCIÓN INCIDENTES)</strong>'
+
             infoWindowMapa.setContent(`
                 <div style="padding:10px; font-family:sans-serif;">
-                    <strong style="color:#007AFF; display:block; margin-bottom:5px;">RUTA ÓPTIMA DETECTADA</strong>
-                    <div style="font-size:12px; color:#444;">
+                    ${statusText}
+                    <div style="font-size:12px; color:#444; margin-top:5px;">
                         Distancia: <b>${route.distance.text}</b><br>
-                        Tiempo estimado: <b>${route.duration.text}</b>
+                        Tiempo: <b>${route.duration.text}</b>
                     </div>
+                    ${!hayRutaLimpia ? '<div style="font-size:9px; color:red; margin-top:5px;">Aviso: No se encontraron rutas alternativas sin incidentes.</div>' : ''}
                 </div>
             `)
             infoWindowMapa.open(map, marcadorDestino)
@@ -441,4 +463,24 @@ function calcularRuta(origen, destino) {
             console.error("No se pudo calcular la ruta:", status)
         }
     })
+}
+
+function detectarConflictoEnRuta(ruta) {
+    if (!incidentesGlobales || incidentesGlobales.length === 0) return false
+
+    const RADIUS_UMBRAL = 150 // metros para considerar que "pasa por" el incidente
+    const path = ruta.overview_path
+
+    for (let incidente of incidentesGlobales) {
+        const posIncidente = new google.maps.LatLng(Number(incidente.lat), Number(incidente.lng))
+        
+        for (let punto of path) {
+            const distancia = google.maps.geometry.spherical.computeDistanceBetween(punto, posIncidente)
+            if (distancia < RADIUS_UMBRAL) {
+                console.warn("Conflicto detectado con incidente:", incidente.titulo)
+                return true 
+            }
+        }
+    }
+    return false
 }
